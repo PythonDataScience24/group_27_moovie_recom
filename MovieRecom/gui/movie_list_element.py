@@ -18,7 +18,7 @@ class MovieListElement(GridLayout):
 
         # Layout
         self.cols = 2
-        self.height = 150
+        self.height = 200
         self.size_hint=(1, None)
 
     
@@ -30,6 +30,7 @@ class MovieListElement(GridLayout):
             allow_stretch=False,
             keep_ratio=True
             )
+        
         
         # Set movie title
         movie_title_string = "[b]{0}[/b] ({1})".format(self.movie.title, self.movie.release_date.year)
@@ -45,27 +46,28 @@ class MovieListElement(GridLayout):
             width=50,
             height=50,
             allow_stretch=False,
-            keep_ratio=True,
+            keep_ratio=True
             )
+        
         self.liked_img.bind(on_touch_down=self.on_heart_click)
 
         # Set tags area
         genre_list = [genre.name for genre in self.movie.genre]
-        self.tag_label = Label(text="Tags: {0}".format(','.join(genre_list)), color="black")
+        self.tag_label = Label(text="Tags: {0}".format(', '.join(genre_list)), color="black")
 
         # Set director area
         director_list = [director.name for director in self.movie.director]
-        self.director_label = Label(text="Directed by: {0}".format(','.join(director_list)), color="black")
+        self.director_label = Label(text="Directed by: {0}".format(', '.join(director_list)), color="black")
 
         # Set actor area
         actor_list = [actor.name for actor in self.movie.actors]
-        self.actor_label = Label(text="Featuring: {0}".format(','.join(actor_list)), color="black")
+        self.actor_label = Label(text="Featuring: {0}".format(', '.join(actor_list)), color="black")
 
         
         # Set misc area
 
         self.misc_layout = GridLayout(rows=2)
-        self.misc_layout.add_widget(Label(text="Duration: ", color="black"))
+        self.misc_layout.add_widget(Label(text="Runtime: {0} min".format(self.movie.runtime), color="black"))
         self.misc_layout.add_widget(Label(text="Country: ", color="black"))
 
 
@@ -95,8 +97,8 @@ class MovieListElement(GridLayout):
         self.add_widget(self.body_layout)
         # self.add_widget()
 
-    # Toggle liked on heart click
     def on_heart_click(self, instance, touch):
+        """Toggle liked on heart click"""
         if self.liked_img.collide_point(*touch.pos):
             self.movie.liked = not self.movie.liked
             self.liked_img.source = 'images/heart-outline.png' if not self.movie.liked else 'images/heart-off-outline.png'

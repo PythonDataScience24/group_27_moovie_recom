@@ -1,5 +1,8 @@
 import datetime
+
+
 class Person():
+    """Class used to represents people"""
     def __init__(self, name:str='', liked:bool=False):
         self.name = name
         self.liked = liked
@@ -7,6 +10,7 @@ class Person():
         return self.name
 
 class Genre():
+    """Class used to represent movie genres"""
     def __init__(self, name:str='', liked:bool=False):
         self.name = name
         self.liked = liked
@@ -14,13 +18,14 @@ class Genre():
         return self.name
 
 class Movie():
+    """Class used to represent movies"""
     def __init__(
             self,
             imdb_id:str='',
             title:str='',
             genre:list[Genre]=[],
             runtime: int = 0, # In minutes
-            release_date:datetime.date=datetime.date.today,
+            release_date:datetime.date=datetime.date.fromtimestamp(0),
             poster_url:str='',
             director:list[Person]=[],
             writer:list[Person]=[],
@@ -39,32 +44,30 @@ class Movie():
         self.actors = actors
         self.liked = liked
 
-
     def from_omdb_dict(self, omdb_movie: dict):
+        """Fills the object's fields with the given omdb dictionnary"""
         
         self.title = omdb_movie.get('Title', '')
         self.imdb_id = omdb_movie.get('imdbID', '')
         self.poster_url = omdb_movie.get('Poster', '')
 
-        # Release Date
-        
-        self.release_date = datetime.date.today()
+        # Defaults to timestamp zero if release date cannot be figured out
+        self.release_date = datetime.date.fromtimestamp(0)
         if omdb_movie.get('Released', '') and omdb_movie['Released'] != 'N/A':
-            print(omdb_movie['Released'])
             self.release_date = datetime.datetime.strptime(omdb_movie['Released'], "%d %b %Y")
 
+        # Defaults to 0 minute if runtime cannot be figured out
         self.runtime = 0
         if omdb_movie.get('Runtime', '') and omdb_movie['Runtime'] != 'N/A':
             self.runtime = omdb_movie['Runtime'].split()[0] if omdb_movie.get('Runtime', '') else 0
 
-
         self.genre = [Genre(name=genre.strip()) for genre in omdb_movie.get('Genre', '').split(',')]
-        
         self.director = [Person(name=director.strip()) for director in omdb_movie.get('Director', '').split(',')]
         self.writer = [Person(name=writer.strip()) for writer in omdb_movie.get('Writer', '').split(',')]
         self.actors = [Person(name=actor.strip()) for actor in omdb_movie.get('Actors', '').split(',')]
-        
+    
     def to_dict(self) -> dict:
+        """Returns the object in the form of a dictionnary."""
         return {
             'imdb_id': self.imdb_id,
             'title': self.title,
