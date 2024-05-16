@@ -8,6 +8,8 @@ from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelItem
 from kivy.uix.label import Label
 from recommendation_system import RecommendationSystem
 from movie_list_element import MovieListElement
+from movie import Movie
+
 
 recsys = RecommendationSystem()
 
@@ -116,14 +118,8 @@ class MainLayout(TabbedPanel):
         self.recommended_movies_list.clear_widgets()
         recommendations = recsys.generate_recommendations()
         recommended_movies = [Movie(
-            imdb_id=row['imdb_id'],
-            title=row['title'],
-            poster_url=row['poster_url'],
-            genre=row['genre'],
-            director=row['director'],
-            actors=row['actors'],
-            release_date=row['release_date'],
-            liked=row['liked']
+            imdb_id=row['tconst'],
+            title=row['originalTitle'],
         ) for _, row in recommendations.iterrows()]
         for movie in recommended_movies:
             movie_element = MovieListElement(movie, recsys)
