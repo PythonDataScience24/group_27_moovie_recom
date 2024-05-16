@@ -2,6 +2,9 @@ from movie import Movie, Genre, Person
 from pandas import Series, DataFrame
 import pandas as pd
 import requests
+import pickle
+from scipy import sparse
+from sklearn.metrics.pairwise import cosine_similarity
 
 class RecommendationSystem():
     """Class used to handle user preferances and API calls"""
@@ -17,7 +20,8 @@ class RecommendationSystem():
                 'director',
                 'writer',
                 'actors',
-                'liked'])
+                'liked'
+            ])
         
         self.liked_genres: Series[str] = Series()
         self.liked_directors: Series[str] = Series()
@@ -26,6 +30,16 @@ class RecommendationSystem():
 
         # Contains all the movies loaded from the latest API call
         self.loaded_movies: list[Movie] = []
+
+        # CountVectorizer
+        with open('finalized_model.pkl', 'rb') as f:
+            self.vectorizer = pickle.load(f)
+
+        # Already vectorized all the movies in dataset of recommendations
+        self.vectorized_dataset = sparse.load_npz('sparse_matrix.npz')
+
+        # Dataset with all data about movie for recommendations
+        self.df_full = pd.read_csv("finalized_dataset.csv")
 
 
     def movie_query(self, query:str) -> list[Movie]:
@@ -169,4 +183,28 @@ class RecommendationSystem():
             self.liked_actors = self.liked_actors.drop(self.liked_actors[self.liked_actors == actor.name].index)
 
 
+    def recommend_movie(self):
+        # get prepared dataset of liked movies
+        df_liked_movies = self.df_full[self.df_full['tconst'].isin(self.liked_movies["imdb_id"])]
+        user_movie_idx = df_liked_movies.index
+
+        # retrieve soup from actors/directors/writes ids + genres
+        movies_soup = df_liked_movies['soup']
+        # transform soup to sparse matrix of vectorized values
+        count_user_matrix = self.vectorizer.transform(movies_soup)
+        # sum up vectors and normalize it
+        count_user_vec = count_user_matrix.sum(axis=0) / count_user_matrix.sum(axis=0).max()
+
+        # calculate similarity
+        similarity = cosine_similarity(sparse.csr_matrix(count_user_vec), self.vectorized_dataset)[0]
+        # add info about average rating from all users, to let top movies be higher
+        scores = similarity * self.df_full['weightedAverageScales']
+
+        # sort similarities
+        similar_scores = list(enumerate(scores))
+        similar_scores = sorted(similar_scores, key=lambda x: x[1], reverse=True)
+
+        # retrieve top 10 idx movies to recommend
+        recommend_movie_indices = [idx for idx, score in similar_scores if idx not in user_movie_idx][:10]
+        return self.df_full.loc[recommend_movie_indices]
 
