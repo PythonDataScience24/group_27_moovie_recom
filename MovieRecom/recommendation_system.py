@@ -219,7 +219,7 @@ class RecommendationSystem():
         df_liked_movies = self.df_full[self.df_full['tconst'].isin(self.liked_movies["imdb_id"])]
         user_movie_idx = df_liked_movies.index
 
-        movies_soup = df_liked_movies['soup']
+        movies_soup = df_liked_movies['soup;'] #idk what happened with the csv file
         count_user_matrix = self.vectorizer.transform(movies_soup)
         count_user_vec = count_user_matrix.sum(axis=0) / count_user_matrix.sum(axis=0).max()
 
