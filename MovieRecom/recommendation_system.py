@@ -214,6 +214,7 @@ class RecommendationSystem():
             print(f"Error during UI update: {e}")
 
 
+    #Necessary to have movies in the liked list, otherwise NaN issue arises.
     def generate_recommendations(self):
         """Generates movie recommendations based on liked movies."""
         df_liked_movies = self.df_full[self.df_full['tconst'].isin(self.liked_movies["imdb_id"])]
