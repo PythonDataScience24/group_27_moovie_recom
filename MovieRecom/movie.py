@@ -71,13 +71,13 @@ class Movie():
         return {
             'imdb_id': self.imdb_id,
             'title': self.title,
-            'genre': [g.name for g in self.genre],
+            'genre': self.genre,
             'runtime': self.runtime,
-            'release_date': self.release_date.isoformat(),
+            'release_date': self.release_date,
             'poster_url': self.poster_url,
-            'director': [d.name for d in self.director],
-            'writer': [w.name for w in self.writer],
-            'actors': [a.name for a in self.actors],
+            'director': self.director,
+            'writer': self.writer,
+            'actors': self.actors,
             'liked': self.liked
         }
 
