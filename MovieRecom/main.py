@@ -7,9 +7,8 @@ from kivy.core.window import Window
 from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelItem
 from kivy.uix.label import Label
 from recommendation_system import RecommendationSystem
-from movie_list_element import MovieListElement
+from gui.movie_list_element import MovieListElement
 from movie import Movie
-
 
 recsys = RecommendationSystem()
 
