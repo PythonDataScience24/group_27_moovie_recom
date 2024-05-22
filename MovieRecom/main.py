@@ -1,4 +1,5 @@
 from kivy.app import App
+from kivy_garden.matplotlib.backend_kivyagg import FigureCanvasKivyAgg
 from kivy.uix.textinput import TextInput
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
@@ -8,6 +9,8 @@ from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelItem
 from kivy.uix.label import Label
 from recommendation_system import RecommendationSystem
 from gui.movie_list_element import MovieListElement
+from gui.data_visualization import create_liked_visualizations
+import pandas as pd
 from movie import Movie
 
 recsys = RecommendationSystem()
@@ -19,6 +22,17 @@ class MovieList(BoxLayout):
         self.orientation = 'vertical'
         self.size_hint_y = None
         self.bind(minimum_height=self.setter('height'))
+
+
+class VisualizationBox(BoxLayout):
+    def __init__(self, **kwargs):
+        super(VisualizationBox, self).__init__(**kwargs)
+        self.figureCanvas = None
+    def update_visualization(self):
+        figure = recsys.get_liked_visualization()
+        self.clear_widgets()
+        self.figureCanvas = FigureCanvasKivyAgg(figure)
+        self.add_widget(self.figureCanvas)
 
 
 class SearchBar(BoxLayout):
@@ -41,6 +55,8 @@ class MainLayout(TabbedPanel):
         liked_tab = TabbedPanelItem(text='Liked Movies')
         recommended_tab = TabbedPanelItem(text='Recommended')
 
+        self.visualization = VisualizationBox()
+
         # Search Tab
         search_layout = BoxLayout(orientation='vertical')
         search_bar = SearchBar()
@@ -52,12 +68,13 @@ class MainLayout(TabbedPanel):
         search_tab.add_widget(search_layout)
 
         # Liked Movies Tab
-        liked_layout = BoxLayout(orientation='vertical')
-        liked_scroll = ScrollView(size_hint=(1, 1))
+        liked_layout = BoxLayout(orientation='horizontal')
+        liked_scroll = ScrollView(size_hint=(2, 1))
         self.liked_movies_list = GridLayout(cols=1, spacing=100, size_hint_y=None)
         self.liked_movies_list.bind(minimum_height=self.liked_movies_list.setter('height'))
         liked_scroll.add_widget(self.liked_movies_list)
         liked_layout.add_widget(liked_scroll)
+        liked_layout.add_widget(self.visualization)
         liked_tab.add_widget(liked_layout)
 
         # Recommended Movies Tab
@@ -82,6 +99,9 @@ class MainLayout(TabbedPanel):
 
     def on_touch_down(self, touch):
         print("Touch event detected")
+
+        self.visualization.update_visualization() # temporaryly placed here
+        
         return super(MainLayout, self).on_touch_down(touch)
 
     def handle_tab_switch(self, *args):

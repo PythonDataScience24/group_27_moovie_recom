@@ -8,6 +8,8 @@ from sklearn.metrics.pairwise import cosine_similarity
 from kivy.app import App
 from kivy.uix.label import Label
 
+from gui.data_visualization import create_liked_visualizations
+
 
 class RecommendationSystem():
     """Class used to handle user preferences and API calls"""
@@ -31,6 +33,8 @@ class RecommendationSystem():
         self.liked_writers: Series[str] = Series()
         self.liked_actors: Series[str] = Series()
 
+        self.liked_visual_figure = None
+
         # Contains all the movies loaded from the latest API call
         self.loaded_movies: list[Movie] = []
 
@@ -43,6 +47,16 @@ class RecommendationSystem():
 
         # Dataset with all data about movie for recommendations
         self.df_full = pd.read_csv("finalized_dataset.csv")
+
+
+    def update_liked_visualizations(self) -> None:
+        """Update the saved visualization figure to represent current liked movies"""
+        self.liked_visual_figure = create_liked_visualizations(self.liked_movies)
+
+
+    def get_liked_visualization(self):
+        """Return the saved pyplot figure with liked movie visualizations"""
+        return self.liked_visual_figure
 
 
     def movie_query(self, query: str) -> list[Movie]:
@@ -186,7 +200,7 @@ class RecommendationSystem():
         """Updates the UI to reflect changes in the liked movies list."""
         print("Attempting to update UI...")
         try:
-            from movie_list_element import MovieListElement  # Local import to avoid circular dependency
+            from gui.movie_list_element import MovieListElement  # Local import to avoid circular dependency
             app = App.get_running_app()
             print("App instance:", app)
             root_widget = app.root

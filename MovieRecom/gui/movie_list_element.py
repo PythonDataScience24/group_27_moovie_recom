@@ -103,3 +103,4 @@ class MovieListElement(GridLayout):
             self.movie.liked = not self.movie.liked
             self.liked_img.source = 'images/heart-outline.png' if not self.movie.liked else 'images/heart-off-outline.png'
             self.recsys.set_liked_movie(self.movie, self.movie.liked)
+            self.recsys.update_liked_visualizations()
