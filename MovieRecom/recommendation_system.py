@@ -39,14 +39,14 @@ class RecommendationSystem():
         self.loaded_movies: list[Movie] = []
 
         # CountVectorizer
-        with open('finalized_model.pkl', 'rb') as f:
+        with open('data/finalized_model.pkl', 'rb') as f:
             self.vectorizer = pickle.load(f)
 
         # Already vectorized all the movies in dataset of recommendations
-        self.vectorized_dataset = sparse.load_npz('vectorized_dataset.npz')
+        self.vectorized_dataset = sparse.load_npz('data/vectorized_dataset.npz')
 
         # Dataset with all data about movie for recommendations
-        self.df_full = pd.read_csv("finalized_dataset.csv")
+        self.df_full = pd.read_csv("data/finalized_dataset.csv")
 
 
     def update_liked_visualizations(self) -> None:
