@@ -4,3 +4,4 @@ matplotlib~=3.8.0
 requests~=2.31.0
 scipy~=1.11.4
 scikit-learn~=1.2.2
+kivy_garden.matplotlib~=0.1.1.dev0
