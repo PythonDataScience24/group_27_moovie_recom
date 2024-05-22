@@ -1,6 +1,5 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
 
 """     liked_movie_list columns:
                 'imdb_id'
@@ -51,7 +50,6 @@ def create_liked_visualizations(liked_movie_list: pd.DataFrame) -> plt.Figure:
     ax[0].pie(x=split_genre_df['imdb_id'], labels=split_genre_df.index)
 
     ax[1].set_title("movie runtime")
-    print(liked_movie_list['runtime'])
     ax[1].violinplot(dataset=liked_movie_list['runtime'].astype(int), vert=False, showmeans=True)
     #ax[1].boxplot(x=liked_movie_list['runtime'].astype(int), vert=False, notch=True)
 
