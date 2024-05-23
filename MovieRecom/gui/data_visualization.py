@@ -103,7 +103,7 @@ def plot_genre_pie(fig, ax, genre_df):
 
     explode = [0.05 for _ in range(len(genre_df))]
 
-    ax.set_title("favorite genres", color="#ddf0ff")
+    ax.set_title("Favorite genres", color="#ddf0ff")
     # ax.pie(x=genre_df['imdb_id'], labels=genre_df.index)
     ax.pie(
         x=genre_df['imdb_id'],
@@ -120,7 +120,7 @@ def plot_genre_pie(fig, ax, genre_df):
     fig.patch.set_facecolor('#23262B')
 
 def plot_violin_runtime(ax, runtime_data):
-    ax.set_title("movie runtime", color="#ddf0ff")
+    ax.set_title("Movie runtime", color="#ddf0ff")
     violinplot = ax.violinplot(dataset=runtime_data, vert=False, showmeans=True)
     ax.set_facecolor('#23262B')
     # ax[1].boxplot(x=liked_movie_list['runtime'].astype(int), vert=False, notch=True)
@@ -143,7 +143,7 @@ def plot_violin_runtime(ax, runtime_data):
 def plot_actors_bar(ax, actors_df):
     colors_to_plot = np.random.choice(PALETTE, size=len(actors_df), replace=False)
 
-    ax.set_title("favorite actors", color="#ddf0ff")
+    ax.set_title("Favorite actors", color="#ddf0ff")
     ax.bar(x=actors_df.index, height=actors_df['imdb_id'], color=colors_to_plot)
 
     ax.set_facecolor('#23262B')
@@ -151,5 +151,4 @@ def plot_actors_bar(ax, actors_df):
     ax.tick_params(axis='x', labelrotation=-45)
     for spine in ax.spines.values():
         spine.set_edgecolor("#23262B")
-
 
