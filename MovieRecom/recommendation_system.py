@@ -39,14 +39,14 @@ class RecommendationSystem():
         self.loaded_movies: list[Movie] = []
 
         # CountVectorizer
-        with open('data/finalized_model.pkl', 'rb') as f:
+        with open('../data/finalized_model.pkl', 'rb') as f:
             self.vectorizer = pickle.load(f)
 
         # Already vectorized all the movies in dataset of recommendations
-        self.vectorized_dataset = sparse.load_npz('data/vectorized_dataset.npz')
+        self.vectorized_dataset = sparse.load_npz('../data/vectorized_dataset.npz')
 
         # Dataset with all data about movie for recommendations
-        self.df_full = pd.read_csv("data/finalized_dataset.csv")
+        self.df_full = pd.read_csv("../data/finalized_dataset.csv")
 
 
     def update_liked_visualizations(self) -> None:
@@ -234,12 +234,12 @@ class RecommendationSystem():
         df_liked_movies = self.df_full[self.df_full['tconst'].isin(self.liked_movies["imdb_id"])]
         user_movie_idx = df_liked_movies.index
 
-        movies_soup = df_liked_movies['soup;'] #idk what happened with the csv file
+        movies_soup = df_liked_movies['soup']
         count_user_matrix = self.vectorizer.transform(movies_soup)
         count_user_vec = count_user_matrix.sum(axis=0) / count_user_matrix.sum(axis=0).max()
 
         similarity = cosine_similarity(sparse.csr_matrix(count_user_vec), self.vectorized_dataset)[0]
-        scores = similarity * self.df_full['weightedAverageScales']
+        scores = similarity * self.df_full['weightedAverage']
 
         similar_scores = list(enumerate(scores))
         similar_scores = sorted(similar_scores, key=lambda x: x[1], reverse=True)
