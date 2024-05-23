@@ -23,10 +23,16 @@ The Movie Recommendation System allows users to input movies they have watched a
 
 To run the Movie Recommendation System locally, follow these steps:
 
-1. Clone the repository: `git clone https://github.com/PythonDataScience24/group_27_movie_recom.git`
-2. Navigate to the project directory: `cd group_27_movie_recom`
-3. Install dependencies: `pip install -r requirements.txt`
-4. Install one more library be executing: `python -m pip install https://github.com/kivy-garden/matplotlib/archive/master.zip`
+1. Ensure Python and pip are installed:
+   * Download and install Python from the official website: Python.org
+   * Ensure pip (Python package installer) is installed. It usually comes with Python. You can verify the installation by running python --version and pip --version in your terminal.
+2. Ensure Git is installed:
+   * Download and install Git from the official website: Git-scm.com
+   * Verify the installation by running git --version in your terminal.
+3. Clone the repository: `git clone https://github.com/PythonDataScience24/group_27_movie_recom.git`
+4. Navigate to the project directory: `cd group_27_movie_recom`
+5. Install dependencies: `pip install -r requirements.txt`
+6. Install one more library be executing: `python -m pip install https://github.com/kivy-garden/matplotlib/archive/master.zip`
 
 ## Usage
 
