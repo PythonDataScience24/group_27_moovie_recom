@@ -101,6 +101,8 @@ class MainLayout(TabbedPanel):
         print("Touch event detected")
 
         self.visualization.update_visualization() # temporaryly placed here
+
+        self.handle_tab_switch()
         
         return super(MainLayout, self).on_touch_down(touch)
 
