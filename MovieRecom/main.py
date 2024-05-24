@@ -100,18 +100,18 @@ class MainLayout(TabbedPanel):
     def on_touch_down(self, touch):
         print("Touch event detected")
 
+        self.handle_tab_switch(
+)
         self.visualization.update_visualization() # temporaryly placed here
-
-        self.handle_tab_switch()
         
         return super(MainLayout, self).on_touch_down(touch)
 
     def handle_tab_switch(self, *args):
         print(f"Current tab: {self.current_tab.text}")
-        if self.current_tab.text == 'Liked Movies':
+        if self.current_tab.text == 'Search':
             print("Switching to Liked Movies tab")
             self.update_liked_movies_list()
-        elif self.current_tab.text == 'Recommended':
+        elif self.current_tab.text == 'Liked Movies':
             print("Switching to Recommended tab")
             self.update_recommendations_tab()
 
