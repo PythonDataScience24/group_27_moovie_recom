@@ -245,4 +245,4 @@ class RecommendationSystem():
         similar_scores = sorted(similar_scores, key=lambda x: x[1], reverse=True)
 
         recommend_movie_indices = [idx for idx, score in similar_scores if idx not in user_movie_idx][:10]
-        return self.df_full
+        return self.df_full.iloc[recommend_movie_indices]
