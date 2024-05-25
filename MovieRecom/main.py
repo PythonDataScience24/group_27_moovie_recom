@@ -12,6 +12,9 @@ from gui.movie_list_element import MovieListElement
 from gui.data_visualization import create_liked_visualizations
 import pandas as pd
 from movie import Movie
+import requests
+from datetime import datetime
+
 
 recsys = RecommendationSystem()
 
@@ -138,16 +141,27 @@ class MainLayout(TabbedPanel):
         print("Updating recommendations tab...")
         self.recommended_movies_list.clear_widgets()
         recommendations = recsys.generate_recommendations()
-        recommended_movies = [Movie(
-            imdb_id=row['tconst'],
-            title=row['originalTitle'],
-        ) for _, row in recommendations.iterrows()]
-        for movie in recommended_movies:
-            movie_element = MovieListElement(movie, recsys)
-            print(f"Adding recommended movie: {movie.title}")
-            self.recommended_movies_list.add_widget(movie_element)
+    
+        for _, row in recommendations.iterrows():
+            imdb_id = row['tconst']
+            url = f"http://www.omdbapi.com/?apikey=3ade98ca&i={imdb_id}"
+            response = requests.get(url)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Create the Movie object using the existing method
+                movie = Movie()
+                movie.from_omdb_dict(data)  # Populate movie using the existing method
+                
+                # Create and add the MovieListElement to the UI
+                movie_element = MovieListElement(movie,recsys)
+                self.recommended_movies_list.add_widget(movie_element)
+                print(f"Adding recommended movie: {movie.title}")
+            else:
+                print(f"Failed to fetch details for movie with ID {imdb_id}")
+    
         print("Added recommended movies to the list")
-
 
 class MovieRecomApp(App):
     def build(self):
