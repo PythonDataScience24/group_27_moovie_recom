@@ -6,8 +6,10 @@ from kivy.uix.gridlayout import GridLayout
 from kivy_garden.matplotlib.backend_kivyagg import FigureCanvasKivyAgg
 
 from gui.movie_list_element import MovieListElement
+from gui.movie_list import MovieList
 
 from recommendation_system import RecommendationSystem
+
 from movie import Movie
 
 
@@ -35,22 +37,23 @@ class LikedTab(TabbedPanelItem):
 
         self.recsys = recsys
 
-        liked_layout = BoxLayout(orientation='horizontal')
-        liked_scroll = ScrollView(size_hint=(2, 1))
-        self.liked_movies_list = GridLayout(cols=1, spacing=100, size_hint_y=None)
-        self.liked_movies_list.bind(minimum_height=self.liked_movies_list.setter('height'))
+        self.liked_layout = BoxLayout(orientation='horizontal')
         self.visualization = VisualizationBox(self.recsys)
-        
-        liked_scroll.add_widget(self.liked_movies_list)
-        liked_layout.add_widget(liked_scroll)
-        liked_layout.add_widget(self.visualization)
-        self.add_widget(liked_layout)
+
+
+        self.movie_list = MovieList()
+        self.movie_scroll = ScrollView(size_hint=(2, 1))
+
+        self.movie_scroll.add_widget(self.movie_list)
+        self.liked_layout.add_widget(self.movie_scroll)
+        self.liked_layout.add_widget(self.visualization)
+        self.add_widget(self.liked_layout)
 
 
     def update(self):
         """Updates the liked tab."""
         # Clearing the movie list
-        self.liked_movies_list.clear_widgets()
+        self.movie_list.clear_widgets()
 
         # Creating the list of liked movies
         for _, movie_row in self.recsys.liked_movies.iterrows():
@@ -66,7 +69,7 @@ class LikedTab(TabbedPanelItem):
                 liked=movie_row['liked'],)
 
             
-            self.liked_movies_list.add_widget(MovieListElement(movie_obj, self.recsys))
+            self.movie_list.add_widget(MovieListElement(movie_obj, self.recsys))
 
             # Update the visualization
             self.recsys.update_liked_visualizations()

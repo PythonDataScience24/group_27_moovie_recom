@@ -3,9 +3,10 @@ import datetime
 
 class Person():
     """Class used to represents people"""
-    def __init__(self, name:str='', liked:bool=False):
+    def __init__(self, name:str='', portrait_url='', liked:bool=False):
         self.name = name
         self.liked = liked
+        self.portrait_url = portrait_url
     def __str__(self) -> str:
         return self.name
 

@@ -98,3 +98,23 @@ class TMDBInterface:
         
         return movie_list
         
+
+    def search_director(self, query:str)->list[Person]:
+        """Returns a list of director Person objects given a certain search query."""
+
+        get_request = f"/search/person?query={query}"
+        json_person_list = self.__api_request__(get_request)['results']
+
+
+
+        director_list: list[Person] = []
+
+        for json_person in json_person_list:
+            if json_person['known_for_department'] == "Directing":
+                poster_url = ""
+                if json_person['profile_path']:
+                    poster_url = f'{self.img_url}{json_person['profile_path']}'
+
+                director_list.append(Person(json_person['name'], poster_url))
+
+        return director_list
