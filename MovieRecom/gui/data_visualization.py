@@ -26,7 +26,7 @@ PALETTE = palette = np.array([
 ])
 
 """     liked_movie_list columns:
-                'imdb_id'
+                'id'
                 'title'
                 'genre'
                 'runtime'
@@ -45,7 +45,6 @@ def create_liked_visualizations(liked_movie_list: pd.DataFrame) -> plt.Figure:
         - box plot of runtime
         - bar chart of actors
     """
-
     genre_df = create_genre_data(liked_movie_list)
     actors_df = create_actor_data(liked_movie_list)
     runtime_data = create_runtime_data(liked_movie_list)
@@ -56,24 +55,24 @@ def create_liked_visualizations(liked_movie_list: pd.DataFrame) -> plt.Figure:
 
 def create_genre_data(liked_movie_list):
     # create genre pie chart data
-    genre_df = liked_movie_list[['imdb_id', 'genre']]
+    genre_df = liked_movie_list[['id', 'genre']]
     split_genre_df = pd.DataFrame()
     for index, entry in genre_df.iterrows():
         for genre in entry['genre']:
             split_genre_df = pd.concat(
-                [pd.DataFrame(data=[[entry['imdb_id'], str(genre)]], columns=genre_df.columns), split_genre_df],
+                [pd.DataFrame(data=[[entry['id'], str(genre)]], columns=genre_df.columns), split_genre_df],
                 ignore_index=True)
     split_genre_df = split_genre_df.groupby(['genre']).count()
 
     return split_genre_df
 
 def create_actor_data(liked_movie_list):
-    actors_df = liked_movie_list[['imdb_id', 'actors']]
+    actors_df = liked_movie_list[['id', 'actors']]
     split_actors_df = pd.DataFrame()
     for index, entry in actors_df.iterrows():
         for actor in entry['actors']:
             split_actors_df = pd.concat(
-                [pd.DataFrame(data=[[entry['imdb_id'], str(actor)]], columns=actors_df.columns), split_actors_df],
+                [pd.DataFrame(data=[[entry['id'], str(actor)]], columns=actors_df.columns), split_actors_df],
                 ignore_index=True)
     split_actors_df = split_actors_df.groupby(['actors']).count()
 
@@ -104,9 +103,9 @@ def plot_genre_pie(fig, ax, genre_df):
     explode = [0.05 for _ in range(len(genre_df))]
 
     ax.set_title("Favorite genres", color="#ddf0ff")
-    # ax.pie(x=genre_df['imdb_id'], labels=genre_df.index)
+    # ax.pie(x=genre_df['id'], labels=genre_df.index)
     ax.pie(
-        x=genre_df['imdb_id'],
+        x=genre_df['id'],
         labels=genre_df.index,
         colors=colors_to_plot,
         startangle=60,
@@ -141,10 +140,11 @@ def plot_violin_runtime(ax, runtime_data):
         spine.set_edgecolor("#23262B")
 
 def plot_actors_bar(ax, actors_df):
-    colors_to_plot = np.random.choice(PALETTE, size=len(actors_df), replace=False)
+    # colors_to_plot = np.random.choice(PALETTE, size=len(actors_df), replace=False)
 
     ax.set_title("Favorite actors", color="#ddf0ff")
-    ax.bar(x=actors_df.index, height=actors_df['imdb_id'], color=colors_to_plot)
+    # ax.bar(x=actors_df.index, height=actors_df['id'], color=colors_to_plot)
+    ax.bar(x=actors_df.index, height=actors_df['id'])
 
     ax.set_facecolor('#23262B')
     ax.tick_params(color="#ddf0ff", labelcolor="#ddf0ff")

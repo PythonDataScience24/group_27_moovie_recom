@@ -33,16 +33,31 @@
 #                     height: self.minimum_height
 
 
-
-<MainLayout>:
-    do_default_tab: False
-
-
 <Label>:
     text_size: self.size
     halign: 'left'
     valign: 'middle'
     font_family: 'Helvetica'
+
+
+
+
+# <TabbedPanel>:
+#         # ...other settings
+#     TabbedPanelItem:
+#         BoxLayout:
+#             Label:
+#                 width: 100
+#                 halign: 'center'
+#                 valign: 'middle'
+#                 font_family: 'Helvetica'
+
+
+
+
+<MainLayout>:
+    do_default_tab: False
+
 
 <MovieListElement>:
     canvas.before:

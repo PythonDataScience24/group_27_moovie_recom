@@ -25,7 +25,6 @@ class MovieListElement(GridLayout):
         self.size_hint=(1, None)
 
     
-
         # Load poster image from URL
         self.poster_img = AsyncImage(
             source=self.movie.poster_url,

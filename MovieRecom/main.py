@@ -7,6 +7,8 @@ from gui.recommended_tab import RecommendedTab
 
 from recommendation_system import RecommendationSystem
 
+from tmdb_interface import TMDBInterface
+
 recsys = RecommendationSystem()
 
 
@@ -16,7 +18,7 @@ class MainLayout(TabbedPanel):
     def __init__(self, **kwargs):
         super(MainLayout, self).__init__(**kwargs)
 
-        self.do_default_tab = False
+        # self.do_default_tab = False
 
         self.search_tab = SearchTab(recsys)
         self.liked_tab = LikedTab(recsys)
@@ -40,8 +42,6 @@ class MainLayout(TabbedPanel):
             case _:
                 # If we end up here, something as gone wrong...
                 pass
-            
-
 
 class MovieRecomApp(App):
     """Application class of the program."""
@@ -53,4 +53,5 @@ class MovieRecomApp(App):
 
 
 if __name__ == '__main__':
+    tmdbi = TMDBInterface()
     MovieRecomApp().run()

@@ -10,10 +10,12 @@ from gui.movie_list import MovieList
 
 class SearchBar(BoxLayout):
     """Class used to display a searchbar."""
-    def __init__(self, recsys:RecommendationSystem, **kwargs):
+    def __init__(self, recsys:RecommendationSystem, movie_list:MovieList, **kwargs):
         super(SearchBar, self).__init__(**kwargs)
 
         self.recsys = recsys
+
+        self.movie_list = movie_list
 
         self.size_hint_y = None
         self.height = 50
@@ -35,27 +37,31 @@ class SearchBar(BoxLayout):
         if not movie_result_list:
             return
 
-        movie_list = self.find_movie_list(App.get_running_app().root)
-        if movie_list:
-            movie_list.clear_widgets()
-            movie_list.height = 0
+        # movie_list = self.find_movie_list(App.get_running_app().root)
+        # if movie_list:
+        #     movie_list.clear_widgets()
+        #     movie_list.height = 0
+
+        
+        self.movie_list.clear_widgets()
+        self.movie_list.height = 0
 
         for movie_result in movie_result_list:
             new_movie_element = MovieListElement(movie_result, self.recsys)
-            movie_list.add_widget(new_movie_element)
+            self.movie_list.add_widget(new_movie_element)
 
             # Update MovieList height dynamically
-            movie_list.height += new_movie_element.height
+            self.movie_list.height += new_movie_element.height
 
 
 
-    def find_movie_list(self, widget):
-        """Recursively find and return the MovieList widget within the widget tree."""
-        if isinstance(widget, MovieList):
-            return widget
-        for child in widget.children:
-            found = self.find_movie_list(child)
-            if found:
-                return found
-        return None
+    # def find_movie_list(self, widget):
+    #     """Recursively find and return the MovieList widget within the widget tree."""
+    #     if isinstance(widget, MovieList):
+    #         return widget
+    #     for child in widget.children:
+    #         found = self.find_movie_list(child)
+    #         if found:
+    #             return found
+    #     return None
 

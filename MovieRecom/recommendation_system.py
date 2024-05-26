@@ -10,13 +10,14 @@ from kivy.uix.label import Label
 
 from gui.data_visualization import create_liked_visualizations
 
+from tmdb_interface import TMDBInterface
 
 class RecommendationSystem():
     """Class used to handle user preferences and API calls"""
     def __init__(self) -> None:
         self.liked_movies: DataFrame = DataFrame(
             columns=[
-                'imdb_id',
+                'id',
                 'title',
                 'genre',
                 'runtime',
@@ -27,6 +28,8 @@ class RecommendationSystem():
                 'actors',
                 'liked'
             ])
+        
+        self.tmdbi = TMDBInterface()
         
         self.liked_genres: Series[str] = Series()
         self.liked_directors: Series[str] = Series()
@@ -47,6 +50,7 @@ class RecommendationSystem():
 
         # Dataset with all data about movie for recommendations
         self.df_full = pd.read_csv("./data/finalized_dataset.csv")
+        print(self.df_full)
 
 
     def update_liked_visualizations(self) -> None:
@@ -63,42 +67,25 @@ class RecommendationSystem():
         """Makes an API call from a user's query and returns a list of Movie objects."""
         if not query:
             return []
+        
+        # Clear previous search results
+        self.loaded_movies.clear()
 
-        api_key = '3ade98ca'  # Replace with your OMDB API key
-        url = f'http://www.omdbapi.com/?apikey={api_key}&s={query}&type=movie'
-        response = requests.get(url)
-
-        if response.status_code == 200:
-            data = response.json()
-            self.loaded_movies.clear()
-
-            if 'Search' in data:
-                for movie in data['Search']:
-                    new_movie = Movie()
-                    new_movie.from_omdb_dict(movie)
-
-                    url2 = f'http://www.omdbapi.com/?apikey={api_key}&i={new_movie.imdb_id}'
-                    response2 = requests.get(url2)
-                    if response2.status_code == 200:
-                        data2 = response2.json()
-                        new_movie.from_omdb_dict(data2)
-
-                    new_movie.liked = self.is_movie_liked(new_movie)
-                    new_movie.genre = self.init_genres_liked(new_movie.genre)
-                    new_movie.director = self.init_directors_liked(new_movie.director)
-                    new_movie.writer = self.init_writers_liked(new_movie.writer)
-                    new_movie.actors = self.init_actors_liked(new_movie.actors)
-
-                    self.loaded_movies.append(new_movie)
-        else:
-            print(f"Error: {response.status_code} - {response.text}")
+        for new_movie in self.tmdbi.search_movie(query):
+            # We check in our recommendation system if some elements are already liked by the user.
+            new_movie.liked = self.is_movie_liked(new_movie)
+            new_movie.genre = self.init_genres_liked(new_movie.genre)
+            new_movie.director = self.init_directors_liked(new_movie.director)
+            new_movie.writer = self.init_writers_liked(new_movie.writer)
+            new_movie.actors = self.init_actors_liked(new_movie.actors)
+            self.loaded_movies.append(new_movie)
         
         return self.loaded_movies
 
 
     def is_movie_liked(self, movie: Movie) -> bool:
         """Returns whether the provided movie was liked by the user."""
-        return movie.imdb_id in self.liked_movies['imdb_id'].values
+        return movie.id in self.liked_movies['id'].values
 
 
     def is_genre_liked(self, genre: Genre) -> bool:
@@ -156,7 +143,7 @@ class RecommendationSystem():
             df_movie = DataFrame([movie.to_dict()])
             self.liked_movies = pd.concat([self.liked_movies, df_movie], ignore_index=True)
         else:
-            self.liked_movies = self.liked_movies.drop(self.liked_movies[self.liked_movies['imdb_id'] == movie.imdb_id].index)
+            self.liked_movies = self.liked_movies.drop(self.liked_movies[self.liked_movies['id'] == movie.id].index)
         print(self.liked_movies)
 
 
@@ -228,16 +215,13 @@ class RecommendationSystem():
             print(f"Error during UI update: {e}")
 
 
-    # BUG Necessary to have movies in the liked list, otherwise NaN issue arises.
     def generate_recommendations(self) -> DataFrame:
         """Generates movie recommendations based on liked movies."""
 
         if self.liked_movies.empty:
-            
-            print("No liked movie")
-
+            # Return empty liked movie list if we don't have any to display.
             return DataFrame(columns=[
-                'imdb_id',
+                'id',
                 'title',
                 'genre',
                 'runtime',
@@ -250,12 +234,14 @@ class RecommendationSystem():
             ])
         
 
-        df_liked_movies = self.df_full[self.df_full['tconst'].isin(self.liked_movies["imdb_id"])]
+        df_liked_movies = self.df_full[self.df_full['tconst'].isin(self.liked_movies["id"])]
         user_movie_idx = df_liked_movies.index
-
         movies_soup = df_liked_movies['soup']
         count_user_matrix = self.vectorizer.transform(movies_soup)
         count_user_vec = count_user_matrix.sum(axis=0) / count_user_matrix.sum(axis=0).max()
+        
+        
+
 
         similarity = cosine_similarity(sparse.csr_matrix(count_user_vec), self.vectorized_dataset)[0]
         scores = similarity * self.df_full['weightedAverage']
