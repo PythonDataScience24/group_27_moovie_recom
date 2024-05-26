@@ -18,8 +18,6 @@ class MainLayout(TabbedPanel):
     def __init__(self, **kwargs):
         super(MainLayout, self).__init__(**kwargs)
 
-        # self.do_default_tab = False
-
         self.search_tab = SearchTab(recsys)
         self.liked_tab = LikedTab(recsys)
         self.recommended_tab = RecommendedTab(recsys)
@@ -39,9 +37,6 @@ class MainLayout(TabbedPanel):
                 self.liked_tab.update()
             case self.recommended_tab:
                 self.recommended_tab.update()
-            case _:
-                # If we end up here, something as gone wrong...
-                pass
 
 class MovieRecomApp(App):
     """Application class of the program."""

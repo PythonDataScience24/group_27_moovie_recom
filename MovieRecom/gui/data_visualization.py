@@ -62,6 +62,7 @@ def create_genre_data(liked_movie_list):
             split_genre_df = pd.concat(
                 [pd.DataFrame(data=[[entry['id'], str(genre)]], columns=genre_df.columns), split_genre_df],
                 ignore_index=True)
+    
     split_genre_df = split_genre_df.groupby(['genre']).count()
 
     return split_genre_df

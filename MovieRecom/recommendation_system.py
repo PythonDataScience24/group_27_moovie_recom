@@ -39,7 +39,7 @@ class RecommendationSystem():
         self.liked_visual_figure = None
 
         # Contains all the movies loaded from the latest API call
-        self.loaded_movies: list[Movie] = []
+        # self.loaded_movies: list[Movie] = []
 
         # CountVectorizer
         with open('./data/finalized_model.pkl', 'rb') as f:
@@ -69,7 +69,8 @@ class RecommendationSystem():
             return []
         
         # Clear previous search results
-        self.loaded_movies.clear()
+        # self.loaded_movies.clear()
+        loaded_movies: list[Movie] = []
 
         for new_movie in self.tmdbi.search_movie(query):
             # We check in our recommendation system if some elements are already liked by the user.
@@ -78,9 +79,11 @@ class RecommendationSystem():
             new_movie.director = self.init_directors_liked(new_movie.director)
             new_movie.writer = self.init_writers_liked(new_movie.writer)
             new_movie.actors = self.init_actors_liked(new_movie.actors)
-            self.loaded_movies.append(new_movie)
+            # self.loaded_movies.append(new_movie)
+            loaded_movies.append(new_movie)
         
-        return self.loaded_movies
+        # return self.loaded_movies
+        return loaded_movies
 
 
     def is_movie_liked(self, movie: Movie) -> bool:
