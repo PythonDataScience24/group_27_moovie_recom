@@ -48,6 +48,4 @@ class MovieRecomApp(App):
 
 
 if __name__ == '__main__':
-    tmdbi = TMDBInterface()
-    # tmdbi.search_director("Tarantino")
     MovieRecomApp().run()
