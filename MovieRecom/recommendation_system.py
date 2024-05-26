@@ -39,14 +39,14 @@ class RecommendationSystem():
         self.loaded_movies: list[Movie] = []
 
         # CountVectorizer
-        with open('../data/finalized_model.pkl', 'rb') as f:
+        with open('./data/finalized_model.pkl', 'rb') as f:
             self.vectorizer = pickle.load(f)
 
         # Already vectorized all the movies in dataset of recommendations
-        self.vectorized_dataset = sparse.load_npz('../data/vectorized_dataset.npz')
+        self.vectorized_dataset = sparse.load_npz('./data/vectorized_dataset.npz')
 
         # Dataset with all data about movie for recommendations
-        self.df_full = pd.read_csv("../data/finalized_dataset.csv")
+        self.df_full = pd.read_csv("./data/finalized_dataset.csv")
 
 
     def update_liked_visualizations(self) -> None:
@@ -228,9 +228,28 @@ class RecommendationSystem():
             print(f"Error during UI update: {e}")
 
 
-    #Necessary to have movies in the liked list, otherwise NaN issue arises.
-    def generate_recommendations(self):
+    # BUG Necessary to have movies in the liked list, otherwise NaN issue arises.
+    def generate_recommendations(self) -> DataFrame:
         """Generates movie recommendations based on liked movies."""
+
+        if self.liked_movies.empty:
+            
+            print("No liked movie")
+
+            return DataFrame(columns=[
+                'imdb_id',
+                'title',
+                'genre',
+                'runtime',
+                'release_date',
+                'poster_url',
+                'director',
+                'writer',
+                'actors',
+                'liked'
+            ])
+        
+
         df_liked_movies = self.df_full[self.df_full['tconst'].isin(self.liked_movies["imdb_id"])]
         user_movie_idx = df_liked_movies.index
 
@@ -245,4 +264,5 @@ class RecommendationSystem():
         similar_scores = sorted(similar_scores, key=lambda x: x[1], reverse=True)
 
         recommend_movie_indices = [idx for idx, score in similar_scores if idx not in user_movie_idx][:10]
+        
         return self.df_full.iloc[recommend_movie_indices]

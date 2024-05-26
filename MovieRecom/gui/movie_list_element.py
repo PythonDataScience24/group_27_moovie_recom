@@ -1,12 +1,15 @@
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.image import Image, AsyncImage
 from kivy.uix.label import Label
+
 from movie import Movie
 from recommendation_system import RecommendationSystem
 
 
 
 class MovieListElement(GridLayout):
+    """Element used to display information about a movie."""
+
     def __init__(self, movie:Movie, recsys:RecommendationSystem, **kwargs):
         super(MovieListElement, self).__init__(**kwargs)
 
@@ -65,7 +68,6 @@ class MovieListElement(GridLayout):
 
         
         # Set misc area
-
         self.misc_layout = GridLayout(rows=2)
         self.misc_layout.add_widget(Label(text="Runtime: {0} min".format(self.movie.runtime), color="black"))
         self.misc_layout.add_widget(Label(text="Country: ", color="black"))
@@ -98,7 +100,7 @@ class MovieListElement(GridLayout):
         # self.add_widget()
 
     def on_heart_click(self, instance, touch):
-        """Toggle liked on heart click"""
+        """Toggle liked on heart click."""
         if self.liked_img.collide_point(*touch.pos):
             self.movie.liked = not self.movie.liked
             self.liked_img.source = 'images/heart-outline.png' if not self.movie.liked else 'images/heart-off-outline.png'

@@ -9,6 +9,7 @@ from gui.movie_list import MovieList
 
 
 class SearchBar(BoxLayout):
+    """Class used to display a searchbar."""
     def __init__(self, recsys:RecommendationSystem, **kwargs):
         super(SearchBar, self).__init__(**kwargs)
 

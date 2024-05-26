@@ -1,35 +1,42 @@
 #:kivy 1.0.9
 
+# <MainLayout>:
+#     do_default_tab: False
+#     TabbedPanel:
+#         id: tab_panel
+#         on_current_tab: root.handle_tab_switch  # Binding to root instead of app.root
+
+
+#         TabbedPanelItem:
+#             text: 'Search'
+#             BoxLayout:
+#                 orientation: 'vertical'
+#                 Label:
+#                     text: 'Search Area'
+
+#         TabbedPanelItem:
+#             text: 'Liked Movies'
+#             ScrollView:
+#                 GridLayout:
+#                     id: liked_movies_list
+#                     cols: 1
+#                     size_hint_y: None
+#                     height: self.minimum_height
+
+#         TabbedPanelItem:
+#             text: 'Recommended'
+#             ScrollView:
+#                 GridLayout:
+#                     id: recommended_movies_list
+#                     cols: 1
+#                     size_hint_y: None
+#                     height: self.minimum_height
+
+
+
 <MainLayout>:
     do_default_tab: False
-    TabbedPanel:
-        id: tab_panel
-        on_current_tab: root.handle_tab_switch  # Binding to root instead of app.root
 
-        TabbedPanelItem:
-            text: 'Search'
-            BoxLayout:
-                orientation: 'vertical'
-                Label:
-                    text: 'Search Area'
-
-        TabbedPanelItem:
-            text: 'Liked Movies'
-            ScrollView:
-                GridLayout:
-                    id: liked_movies_list
-                    cols: 1
-                    size_hint_y: None
-                    height: self.minimum_height
-
-        TabbedPanelItem:
-            text: 'Recommended'
-            ScrollView:
-                GridLayout:
-                    id: recommended_movies_list
-                    cols: 1
-                    size_hint_y: None
-                    height: self.minimum_height
 
 <Label>:
     text_size: self.size
