@@ -2,7 +2,7 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.image import Image, AsyncImage
 from kivy.uix.label import Label
 
-from movie import Movie
+from movie import Movie, PersonRole
 from recommendation_system import RecommendationSystem
 
 
@@ -112,7 +112,7 @@ class MovieListElement(GridLayout):
     def update(self):
         self.movie.liked = self.recsys.is_movie_liked(self.movie)
         self.movie.genre = self.recsys.init_genres_liked(self.movie.genre)
-        self.movie.director = self.recsys.init_directors_liked(self.movie.director)
-        self.movie.writer = self.recsys.init_writers_liked(self.movie.writer)
-        self.movie.actors = self.recsys.init_actors_liked(self.movie.actors)
+        self.movie.director = self.recsys.init_person_liked(self.movie.director, PersonRole.DIRECTOR)
+        self.movie.writer = self.recsys.init_person_liked(self.movie.writer, PersonRole.WRITER)
+        self.movie.actors = self.recsys.init_person_liked(self.movie.actors, PersonRole.ACTOR)
         self.liked_img.source = 'images/heart-outline.png' if not self.movie.liked else 'images/heart-off-outline.png'

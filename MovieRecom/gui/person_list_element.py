@@ -75,22 +75,11 @@ class PersonListElement(GridLayout):
             self.person.liked = not self.person.liked
             self.liked_img.source = 'images/heart-outline.png' if not self.person.liked else 'images/heart-off-outline.png'
             
-            match self.person.role:
-                case PersonRole.ACTOR:
-                    self.recsys.set_liked_actor(self.person, self.person.liked)
-                case PersonRole.DIRECTOR:
-                    self.recsys.set_liked_director(self.person, self.person.liked)
-                case PersonRole.WRITER:
-                    self.recsys.set_liked_writer(self.person, self.person.liked)
+            self.recsys.set_liked_person(self.person, self.person.liked, self.person.role)
+
 
         
     def update(self):
-        match self.person.role:
-            case PersonRole.ACTOR:
-                self.person.liked = self.recsys.is_actor_liked(self.person)
-            case PersonRole.DIRECTOR:
-                self.person.liked = self.recsys.is_director_liked(self.person)
-            case PersonRole.WRITER:
-                self.person.liked = self.recsys.is_writer_liked(self.person)
+        self.person.liked = self.recsys.is_person_liked(self.person, self.person.role)
         self.liked_img.source = 'images/heart-outline.png' if not self.person.liked else 'images/heart-off-outline.png'
 

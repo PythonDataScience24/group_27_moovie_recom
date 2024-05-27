@@ -3,7 +3,6 @@ from kivy.uix.tabbedpanel import TabbedPanel
 from kivy.core.window import Window
 
 from gui.movie_search_tab import MovieSearchTab
-# from gui.actor_search_tab import ActorSearchTab
 from gui.person_search_tab import PersonSearchTab
 from gui.liked_tab import LikedTab
 from gui.recommended_tab import RecommendedTab
@@ -11,7 +10,6 @@ from gui.recommended_tab import RecommendedTab
 from recommendation_system import RecommendationSystem
 from movie import PersonRole
 
-from tmdb_interface import TMDBInterface
 
 recsys = RecommendationSystem()
 
