@@ -1,10 +1,18 @@
 import datetime
+from enum import Enum
+
+# class syntax
+class PersonRole(Enum):
+    DIRECTOR = 0,
+    WRITER = 1,
+    ACTOR = 1
 
 
 class Person():
     """Class used to represents people"""
-    def __init__(self, name:str='', portrait_url='', liked:bool=False):
+    def __init__(self, name:str, role: PersonRole, portrait_url='', liked:bool=False):
         self.name = name
+        self.role = role
         self.liked = liked
         self.portrait_url = portrait_url
     def __str__(self) -> str:
@@ -45,28 +53,6 @@ class Movie():
         self.actors = actors
         self.liked = liked
 
-    # def from_omdb_dict(self, omdb_movie: dict):
-    #     """Fills the object's fields with the given omdb dictionnary"""
-        
-    #     self.title = omdb_movie.get('Title', '')
-    #     self.imdb_id = omdb_movie.get('imdbID', '')
-    #     self.poster_url = omdb_movie.get('Poster', '')
-
-    #     # Defaults to timestamp zero if release date cannot be figured out
-    #     self.release_date = datetime.date.fromtimestamp(0)
-    #     if omdb_movie.get('Released', '') and omdb_movie['Released'] != 'N/A':
-    #         self.release_date = datetime.datetime.strptime(omdb_movie['Released'], "%d %b %Y")
-
-    #     # Defaults to 0 minute if runtime cannot be figured out
-    #     self.runtime = 0
-    #     if omdb_movie.get('Runtime', '') and omdb_movie['Runtime'] != 'N/A':
-    #         self.runtime = omdb_movie['Runtime'].split()[0] if omdb_movie.get('Runtime', '') else 0
-
-    #     self.genre = [Genre(name=genre.strip()) for genre in omdb_movie.get('Genre', '').split(',')]
-    #     self.director = [Person(name=director.strip()) for director in omdb_movie.get('Director', '').split(',')]
-    #     self.writer = [Person(name=writer.strip()) for writer in omdb_movie.get('Writer', '').split(',')]
-    #     self.actors = [Person(name=actor.strip()) for actor in omdb_movie.get('Actors', '').split(',')]
-    
     def to_dict(self) -> dict:
         """Returns the object in the form of a dictionnary."""
         return {

@@ -1,4 +1,4 @@
-from movie import Movie, Genre, Person
+from movie import Movie, Genre, Person, PersonRole
 from pandas import Series, DataFrame
 import pandas as pd
 import requests
@@ -84,6 +84,34 @@ class RecommendationSystem():
         
         # return self.loaded_movies
         return loaded_movies
+    
+    def person_query(self, query: str, person_role: PersonRole) -> list[Person]:
+        """Makes an API call from a user's query and returns a list of Person objects."""
+        if not query:
+            return []
+        
+        # Clear previous search results
+        loaded_persons: list[Person] = []
+        new_person_list: list[Person] = []
+        
+        new_person_list = self.tmdbi.search_person(query, person_role)
+
+        for new_person in new_person_list:
+            
+            # We check in our recommendation system if some elements are already liked by the user.
+            match person_role:
+                case PersonRole.ACTOR:
+                    new_person = self.init_actors_liked([new_person])[0]
+                    
+                case PersonRole.WRITER:
+                    new_person = self.init_writers_liked([new_person])[0]
+                case PersonRole.DIRECTOR:
+                    new_person = self.init_directors_liked([new_person])[0]
+            
+            loaded_persons.append(new_person)
+        
+        # return self.loaded_movies
+        return loaded_persons
 
 
     def is_movie_liked(self, movie: Movie) -> bool:
@@ -157,34 +185,37 @@ class RecommendationSystem():
             self.liked_genres.add(genre.name)
         else:
             self.liked_genres = self.liked_genres.drop(self.liked_genres[self.liked_genres == genre.name].index)
-
+        print(self.liked_genres)
 
     def set_liked_director(self, director: Person, liked: bool):
         """Likes or unlikes a director."""
         director.liked = liked
         if liked:
-            self.liked_directors.add(director.name)
+            self.liked_directors = pd.concat([self.liked_directors, Series([director.name])], ignore_index=True)
+            # self.liked_directors.append(director.name)
         else:
             self.liked_directors = self.liked_directors.drop(self.liked_directors[self.liked_directors == director.name].index)
-
+        print(self.liked_directors)
 
     def set_liked_writer(self, writer: Person, liked: bool):
         """Likes or unlikes a writer."""
         writer.liked = liked
         if liked:
-            self.liked_writers.add(writer.name)
+            self.liked_writers = pd.concat([self.liked_writers, Series([writer.name])], ignore_index=True)
+            # self.liked_writers.append(writer.name)
         else:
             self.liked_writers = self.liked_writers.drop(self.liked_writers[self.liked_writers == writer.name].index)
-
+        print(self.liked_writers)
 
     def set_liked_actor(self, actor: Person, liked: bool):
         """Likes or unlikes an actor."""
         actor.liked = liked
         if liked:
-            self.liked_actors.add(actor.name)
+            self.liked_actors = pd.concat([self.liked_actors, Series([actor.name])], ignore_index=True)
+            # self.liked_actors.append(actor.name)
         else:
             self.liked_actors = self.liked_actors.drop(self.liked_actors[self.liked_actors == actor.name].index)
-
+        print(self.liked_actors)
 
     def update_liked_movies_ui(self, movie: Movie, add: bool):
         """Updates the UI to reflect changes in the liked movies list."""

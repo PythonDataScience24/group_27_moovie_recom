@@ -2,7 +2,6 @@
 from kivy.uix.tabbedpanel import TabbedPanelItem
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.scrollview import ScrollView
-from kivy.uix.gridlayout import GridLayout
 from kivy_garden.matplotlib.backend_kivyagg import FigureCanvasKivyAgg
 
 from gui.movie_list_element import MovieListElement
@@ -39,7 +38,6 @@ class LikedTab(TabbedPanelItem):
 
         self.liked_layout = BoxLayout(orientation='horizontal')
         self.visualization = VisualizationBox(self.recsys)
-
 
         self.movie_list = MovieList()
         self.movie_scroll = ScrollView(size_hint=(2, 1))

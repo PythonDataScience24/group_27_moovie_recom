@@ -2,7 +2,7 @@
 import requests
 import datetime
 
-from movie import Movie, Genre, Person
+from movie import Movie, Genre, Person, PersonRole
 
 class TMDBInterface:
 
@@ -40,16 +40,16 @@ class TMDBInterface:
         # Get actors
         actor_list: list[Person] = []
         for json_actor in json_movie_details['credits']['cast'][:5]:
-            actor_list.append(Person(json_actor['name']))
+            actor_list.append(Person(json_actor['name'], PersonRole.ACTOR))
         
         # Get director and writers
         director_list: list[Person] = []
         writer_list: list[Person] = []
         for json_crew in json_movie_details['credits']['crew']:
             if json_crew['job'] == "Director":
-                director_list.append(Person(json_crew['name']))
+                director_list.append(Person(json_crew['name'], PersonRole.DIRECTOR))
             if json_crew['department'] == "Writing":
-                writer_list.append(Person(json_crew['name']))
+                writer_list.append(Person(json_crew['name'], PersonRole.WRITER))
 
         poster_url = ""
         if json_movie_details['poster_path']:
@@ -99,22 +99,29 @@ class TMDBInterface:
         return movie_list
         
 
-    def search_director(self, query:str)->list[Person]:
+    def search_person(self, query:str, personRole:PersonRole)->list[Person]:
         """Returns a list of director Person objects given a certain search query."""
 
         get_request = f"/search/person?query={query}"
         json_person_list = self.__api_request__(get_request)['results']
 
-
-
-        director_list: list[Person] = []
+        person_list: list[Person] = []
 
         for json_person in json_person_list:
-            if json_person['known_for_department'] == "Directing":
+            
+            hasRole = False
+            match personRole:
+                case PersonRole.ACTOR:
+                    hasRole = json_person['known_for_department'] == "Acting"
+                case PersonRole.WRITER:
+                    hasRole = json_person['known_for_department'] == "Writing"
+                case PersonRole.DIRECTOR:
+                    hasRole = json_person['known_for_department'] == "Directing"
+
+            if hasRole:
                 poster_url = ""
                 if json_person['profile_path']:
                     poster_url = f'{self.img_url}{json_person['profile_path']}'
+                person_list.append(Person(json_person['name'], personRole, poster_url))
 
-                director_list.append(Person(json_person['name'], poster_url))
-
-        return director_list
+        return person_list

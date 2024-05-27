@@ -2,7 +2,7 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.image import Image, AsyncImage
 from kivy.uix.label import Label
 
-from movie import Movie, Person
+from movie import Movie, Person, PersonRole
 from recommendation_system import RecommendationSystem
 
 
@@ -27,7 +27,7 @@ class PersonListElement(GridLayout):
     
         # Load poster image from URL
         self.poster_img = AsyncImage(
-            source=self.movie.poster_url,
+            source=self.person.portrait_url,
             size_hint=(None, 1),
             allow_stretch=False,
             keep_ratio=True
@@ -35,13 +35,13 @@ class PersonListElement(GridLayout):
         
         
         # Set movie title
-        movie_title_string = "[b]{0}[/b] ({1})".format(self.movie.title, self.movie.release_date.year)
-        self.title_label = Label(text=movie_title_string, color="black", markup=True)
+        person_title_string = "[b]{0}[/b]".format(self.person.name)
+        self.title_label = Label(text=person_title_string, color="black", markup=True)
         self.title_label.font_size = 40
         self.title_label.padding = [10,0,0,0]
 
         # Set "liked" icon
-        self.liked_img_path = 'images/heart-outline.png' if not self.movie.liked else 'images/heart-off-outline.png'
+        self.liked_img_path = 'images/heart-outline.png' if not self.person.liked else 'images/heart-off-outline.png'
         self.liked_img = Image(
             source=self.liked_img_path,
             size_hint=(None, 1),
@@ -53,62 +53,44 @@ class PersonListElement(GridLayout):
         
         self.liked_img.bind(on_touch_down=self.on_heart_click)
 
-        # Set tags area
-        genre_list = [genre.name for genre in self.movie.genre]
-        self.tag_label = Label(text="Tags: {0}".format(', '.join(genre_list)), color="black")
-
-        # Set director area
-        director_list = [director.name for director in self.movie.director]
-        self.director_label = Label(text="Directed by: {0}".format(', '.join(director_list)), color="black")
-
-        # Set actor area
-        actor_list = [actor.name for actor in self.movie.actors]
-        self.actor_label = Label(text="Featuring: {0}".format(', '.join(actor_list)), color="black")
-
-        
-        # Set misc area
-        self.misc_layout = GridLayout(rows=2)
-        self.misc_layout.add_widget(Label(text="Runtime: {0} min".format(self.movie.runtime), color="black"))
-        self.misc_layout.add_widget(Label(text="Country: ", color="black"))
-
-
         # Layouts
         self.body_layout = GridLayout(rows=2)
         self.title_layout = GridLayout(cols=2)
-        self.detail_layout = GridLayout(cols=4)
-
 
         # Title layout
         self.title_layout.add_widget(self.liked_img)
         self.title_layout.add_widget(self.title_label)
 
-        # Detail layout
-        self.detail_layout.add_widget(self.tag_label)
-        self.detail_layout.add_widget(self.director_label)
-        self.detail_layout.add_widget(self.actor_label)
-        self.detail_layout.add_widget(self.misc_layout)
-
         # Body layout
         self.body_layout.add_widget(self.title_layout)
-        self.body_layout.add_widget(self.detail_layout)
         
 
         # Add to layout
         self.add_widget(self.poster_img)
         self.add_widget(self.body_layout)
-        # self.add_widget()
 
     def on_heart_click(self, instance, touch):
         """Toggle liked on heart click."""
         if self.liked_img.collide_point(*touch.pos):
-            self.movie.liked = not self.movie.liked
-            self.liked_img.source = 'images/heart-outline.png' if not self.movie.liked else 'images/heart-off-outline.png'
-            self.recsys.set_liked_movie(self.movie, self.movie.liked)
+            self.person.liked = not self.person.liked
+            self.liked_img.source = 'images/heart-outline.png' if not self.person.liked else 'images/heart-off-outline.png'
+            
+            match self.person.role:
+                case PersonRole.ACTOR:
+                    self.recsys.set_liked_actor(self.person, self.person.liked)
+                case PersonRole.DIRECTOR:
+                    self.recsys.set_liked_director(self.person, self.person.liked)
+                case PersonRole.WRITER:
+                    self.recsys.set_liked_writer(self.person, self.person.liked)
 
-            # self.recsys.update_liked_visualizations()
-
-
-
+        
     def update(self):
-        self.person.liked = self.recsys.is_movie_liked(self.movie)
-        self.liked_img.source = 'images/heart-outline.png' if not self.movie.liked else 'images/heart-off-outline.png'
+        match self.person.role:
+            case PersonRole.ACTOR:
+                self.person.liked = self.recsys.is_actor_liked(self.person)
+            case PersonRole.DIRECTOR:
+                self.person.liked = self.recsys.is_director_liked(self.person)
+            case PersonRole.WRITER:
+                self.person.liked = self.recsys.is_writer_liked(self.person)
+        self.liked_img.source = 'images/heart-outline.png' if not self.person.liked else 'images/heart-off-outline.png'
+

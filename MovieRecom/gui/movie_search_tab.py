@@ -4,22 +4,23 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.scrollview import ScrollView
 
 from recommendation_system import RecommendationSystem
-from gui.searchbar import SearchBar
+from gui.searchbar import MovieSearchBar
 from gui.movie_list import MovieList
 from gui.movie_list_element import MovieListElement
 
 
-class SearchTab(TabbedPanelItem):
+class MovieSearchTab(TabbedPanelItem):
     """Class used to display a search tab."""
 
     def __init__(self, recsys:RecommendationSystem, **kwargs):
-        super(SearchTab, self).__init__(text="Search")
+        super(MovieSearchTab, self).__init__(text="Movie search")
+
 
         self.recsys = recsys
 
         self.search_layout = BoxLayout(orientation='vertical')
         self.movie_list = MovieList()
-        self.search_bar = SearchBar(self.recsys, self.movie_list)
+        self.search_bar = MovieSearchBar(self.recsys, self.movie_list)
         self.movie_scroll = ScrollView(size_hint_y=1)
 
         self.movie_scroll.add_widget(self.movie_list)
