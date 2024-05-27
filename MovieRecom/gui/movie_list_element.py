@@ -16,7 +16,6 @@ class MovieListElement(GridLayout):
         self.img_star_not_liked = "images/star-outline.png"
         self.img_star_liked = "images/star.png"
 
-        self.liked_img_path = self.img_star_not_liked
         self.star_1_img_path = self.img_star_not_liked
         self.star_2_img_path = self.img_star_not_liked
         self.star_3_img_path = self.img_star_not_liked
@@ -48,52 +47,39 @@ class MovieListElement(GridLayout):
         movie_title_string = "[b]{0}[/b] ({1})".format(self.movie.title, self.movie.release_date.year)
         self.title_label = Label(text=movie_title_string, color="black", markup=True)
         self.title_label.font_size = 40
-        self.title_label.padding = [10,0,0,0]
-
-
-        self.liked_img = Image(
-            source=self.liked_img_path,
-            size_hint=(None, 1),
-            width=50,
-            height=50,
-            allow_stretch=False,
-            keep_ratio=True,
-            )
+        self.title_label.halign = 'left'
         
-        self.star_1_img = Image(source=self.star_1_img_path,size_hint=(None, 1),width=50,height=50,allow_stretch=False,keep_ratio=True,)
-        self.star_2_img = Image(source=self.star_2_img_path,size_hint=(None, 1),width=50,height=50,allow_stretch=False,keep_ratio=True,)
-        self.star_3_img = Image(source=self.star_3_img_path,size_hint=(None, 1),width=50,height=50,allow_stretch=False,keep_ratio=True,)
-        self.star_4_img = Image(source=self.star_4_img_path,size_hint=(None, 1),width=50,height=50,allow_stretch=False,keep_ratio=True,)
-        self.star_5_img = Image(source=self.star_5_img_path,size_hint=(None, 1),width=50,height=50,allow_stretch=False,keep_ratio=True,)
+        self.star_1_img = Image(source=self.star_1_img_path,size_hint=(None, 1),width=50,height=50,allow_stretch=False,keep_ratio=True)
+        self.star_2_img = Image(source=self.star_2_img_path,size_hint=(None, 1),width=50,height=50,allow_stretch=False,keep_ratio=True)
+        self.star_3_img = Image(source=self.star_3_img_path,size_hint=(None, 1),width=50,height=50,allow_stretch=False,keep_ratio=True)
+        self.star_4_img = Image(source=self.star_4_img_path,size_hint=(None, 1),width=50,height=50,allow_stretch=False,keep_ratio=True)
+        self.star_5_img = Image(source=self.star_5_img_path,size_hint=(None, 1),width=50,height=50,allow_stretch=False,keep_ratio=True)
 
-        # self.liked_img.bind(on_touch_down=self.on_heart_click)
         self.bind(on_touch_down=self.on_star_click)
-        # self.star_1_img.bind(on_touch_down=self.on_star_click)
-        # self.star_2_img.bind(on_touch_down=self.on_star_click)
-        # self.star_3_img.bind(on_touch_down=self.on_star_click)
-        # self.star_4_img.bind(on_touch_down=self.on_star_click)
-        # self.star_5_img.bind(on_touch_down=self.on_star_click)
+
 
         # Set "liked" icon
         self.update_displayed_rating()
 
         # Set tags area
         genre_list = [genre.name for genre in self.movie.genre]
-        self.tag_label = Label(text="Tags: {0}".format(', '.join(genre_list)), color="black")
+        self.tag_label = Label(text="[b]Tags:[/b] {0}".format(', '.join(genre_list)), color="black", markup=True)
+        self.tag_label.halign = 'left'
 
         # Set director area
         director_list = [director.name for director in self.movie.director]
-        self.director_label = Label(text="Directed by: {0}".format(', '.join(director_list)), color="black")
+        self.director_label = Label(text="[b]Directed by:[/b] {0}".format(', '.join(director_list)), color="black", markup=True)
+        self.director_label.halign = 'left'
 
         # Set actor area
-        actor_list = [actor.name for actor in self.movie.actors]
-        self.actor_label = Label(text="Featuring: {0}".format(', '.join(actor_list)), color="black")
-
+        actor_list = [actor.name for actor in self.movie.actors[:5]]
+        self.actor_label = Label(text="[b]Featuring:[/b] {0}".format(', '.join(actor_list)), color="black", markup=True)
+        self.actor_label.halign = 'left'
         
         # Set misc area
-        self.misc_layout = GridLayout(rows=2)
-        self.misc_layout.add_widget(Label(text="Runtime: {0} min".format(self.movie.runtime), color="black"))
-        self.misc_layout.add_widget(Label(text="Country: ", color="black"))
+        self.misc_layout = GridLayout(rows=1)
+        self.misc_layout.add_widget(Label(text="[b]Runtime:[/b] {0} min".format(self.movie.runtime), color="black", markup=True))
+        # self.misc_layout.add_widget(Label(text="Country: ", color="black"))
 
 
         # Layouts
@@ -119,11 +105,13 @@ class MovieListElement(GridLayout):
         # Body layout
         self.body_layout.add_widget(self.title_layout)
         self.body_layout.add_widget(self.detail_layout)
+        self.body_layout.padding = [10,0,0,0]
         
 
         # Add to layout
         self.add_widget(self.poster_img)
         self.add_widget(self.body_layout)
+        self.padding =[10,10,10,10]
 
     def update_displayed_rating(self):
 
@@ -160,7 +148,6 @@ class MovieListElement(GridLayout):
         if not self.collide_point(*touch.pos):
             return
         
-        print("STAR PRESSED")
         star_clicked = 0
 
         if self.star_1_img.collide_point(*touch.pos):
@@ -174,6 +161,9 @@ class MovieListElement(GridLayout):
         if self.star_5_img.collide_point(*touch.pos):
             star_clicked = 5
 
+        if star_clicked == 0:
+            # We did not click on a star
+            return
         
         if self.movie.rating == star_clicked:
             self.movie.rating = star_clicked-1

@@ -39,17 +39,33 @@ class TMDBInterface:
         
         # Get actors
         actor_list: list[Person] = []
-        for json_actor in json_movie_details['credits']['cast'][:5]:
-            actor_list.append(Person(json_actor['name'], PersonRole.ACTOR))
+        for json_actor in json_movie_details['credits']['cast']:
+            actor_list.append(Person(
+                id=json_actor['id'],
+                name=json_actor['name'],
+                role=PersonRole.ACTOR,
+                portrait_url=json_actor['profile_path']
+                ))
         
         # Get director and writers
         director_list: list[Person] = []
         writer_list: list[Person] = []
         for json_crew in json_movie_details['credits']['crew']:
             if json_crew['job'] == "Director":
-                director_list.append(Person(json_crew['name'], PersonRole.DIRECTOR))
+                director_list.append(Person(
+                    id=json_crew['id'],
+                    name=json_crew['name'],
+                    role=PersonRole.DIRECTOR,
+                    portrait_url=json_crew['profile_path']
+                    ))
+
             if json_crew['department'] == "Writing":
-                writer_list.append(Person(json_crew['name'], PersonRole.WRITER))
+                writer_list.append(Person(
+                    id=json_crew['id'],
+                    name=json_crew['name'],
+                    role=PersonRole.WRITER,
+                    portrait_url=json_crew['profile_path']
+                    ))
 
         poster_url = ""
         if json_movie_details['poster_path']:
@@ -67,6 +83,18 @@ class TMDBInterface:
             actor_list,
         )
     
+    def get_genre_list(self) -> list[Genre]:
+
+        get_request = f"/genre/movie/list"
+        json_genre_list = self.__api_request__(get_request)['genres']
+
+        genre_list: list[Genre] = []
+        for json_genre in json_genre_list:
+            genre_list.append(Genre(json_genre['name']))
+
+        return genre_list
+    
+
 
     def get_movie_from_imdb_id(self, imdb_id:str) -> Movie:
         """Returns a Movie object for a given imdb_id."""
@@ -121,6 +149,6 @@ class TMDBInterface:
                 poster_url = ""
                 if json_person['profile_path']:
                     poster_url = f'{self.img_url}{json_person['profile_path']}'
-                person_list.append(Person(json_person['name'], personRole, poster_url))
+                person_list.append(Person(json_person['id'],json_person['name'], personRole, poster_url))
 
         return person_list

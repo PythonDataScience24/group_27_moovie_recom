@@ -10,11 +10,20 @@ class PersonRole(Enum):
 
 class Person():
     """Class used to represents people"""
-    def __init__(self, name:str, role: PersonRole, portrait_url='', liked:bool=False):
+    def __init__(self, id:str, name:str, role: PersonRole, portrait_url='', liked:bool=False):
+        self.id = id
         self.name = name
         self.role = role
-        self.liked = liked
         self.portrait_url = portrait_url
+        self.liked = liked
+        
+    def to_dict(self) -> dict:
+        return {
+            'id':self.id,
+            'name':self.name,
+            'portrait_url':self.portrait_url,
+            'liked':self.liked
+        }
     def __str__(self) -> str:
         return self.name
 

@@ -5,9 +5,10 @@ import pickle
 from scipy import sparse
 from sklearn.metrics.pairwise import cosine_similarity
 
+from tmdb_interface import TMDBInterface
+
 from gui.data_visualization import create_liked_visualizations
 
-from tmdb_interface import TMDBInterface
 
 class RecommendationSystem():
     """Class used to handle user preferences and API calls"""
@@ -30,9 +31,13 @@ class RecommendationSystem():
         self.tmdbi = TMDBInterface()
         
         self.liked_genres: Series[str] = Series()
-        self.liked_directors: Series[str] = Series()
-        self.liked_writers: Series[str] = Series()
-        self.liked_actors: Series[str] = Series()
+        # self.liked_directors: Series[str] = Series()
+        # self.liked_writers: Series[str] = Series()
+        # self.liked_actors: Series[str] = Series()
+
+        self.liked_directors: DataFrame = DataFrame(columns=['id','name','liked','rating','portrait_url'])
+        self.liked_writers: DataFrame = DataFrame(columns=['id','name','liked','rating','portrait_url'])
+        self.liked_actors: DataFrame = DataFrame(columns=['id','name','liked','rating','portrait_url'])
 
         self.liked_visual_figure = None
 
@@ -47,9 +52,11 @@ class RecommendationSystem():
         self.df_full = pd.read_csv("./data/finalized_dataset.csv")
         print(self.df_full)
 
-
+    # TODO: The two following functions probably shouldn't be placed here
     def update_liked_visualizations(self) -> None:
         """Update the saved visualization figure to represent current liked movies"""
+        if self.liked_movies.empty:
+            return
         self.liked_visual_figure = create_liked_visualizations(self.liked_movies)
 
 
@@ -83,19 +90,17 @@ class RecommendationSystem():
         if not query:
             return []
         
-        # Clear previous search results
-        loaded_persons: list[Person] = []
-        new_person_list: list[Person] = []
-        
         new_person_list = self.tmdbi.search_person(query, person_role)
-
-        for new_person in new_person_list:
-            # We check in our recommendation system if some elements are already liked by the user.
-            new_person = self.init_person_liked([new_person], person_role)[0]
-            
-            loaded_persons.append(new_person)
+        loaded_persons_list = self.init_person_liked(new_person_list, person_role)
         
-        return loaded_persons
+        return loaded_persons_list
+    
+    def genre_query(self) -> list[Genre]:
+        """Returns all the possible genre from the API."""
+        new_genre_list = self.tmdbi.get_genre_list()
+        loaded_genre_list: list[Genre] = self.init_genres_liked(new_genre_list)
+
+        return loaded_genre_list
 
 
     def is_movie_liked(self, movie: Movie) -> tuple[bool, Series]:
@@ -172,7 +177,10 @@ class RecommendationSystem():
         """Likes or unlikes a genre."""
         genre.liked = liked
         if liked:
-            self.liked_genres.add(genre.name)
+            # selected_liked_person_list = pd.concat([selected_liked_person_list, Series([person.name])], ignore_index=True)
+        
+            self.liked_genres = pd.concat([self.liked_genres, Series([genre.name])], ignore_index=True)
+            print(self.liked_genres)
         else:
             self.liked_genres = self.liked_genres.drop(self.liked_genres[self.liked_genres == genre.name].index)
         print(self.liked_genres)
@@ -181,7 +189,7 @@ class RecommendationSystem():
         """Likes or unlikes a person."""
         person.liked = liked
 
-        selected_liked_person_list: list[Person] = []
+        selected_liked_person_list: DataFrame[Person] = DataFrame
 
         match person_role:
             case PersonRole.ACTOR:
@@ -192,7 +200,8 @@ class RecommendationSystem():
                 selected_liked_person_list = self.liked_directors
 
         if liked:
-            selected_liked_person_list = pd.concat([selected_liked_person_list, Series([person.name])], ignore_index=True)
+            df_person = DataFrame([person.to_dict()])
+            selected_liked_person_list = pd.concat([selected_liked_person_list, df_person], ignore_index=True)
         else:
             selected_liked_person_list = selected_liked_person_list.drop(selected_liked_person_list[selected_liked_person_list == person.name].index)
         

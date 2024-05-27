@@ -13,7 +13,7 @@ class MovieSearchTab(TabbedPanelItem):
     """Class used to display a search tab."""
 
     def __init__(self, recsys:RecommendationSystem, **kwargs):
-        super(MovieSearchTab, self).__init__(text="Movie search")
+        super(MovieSearchTab, self).__init__(text="Movie")
 
 
         self.recsys = recsys

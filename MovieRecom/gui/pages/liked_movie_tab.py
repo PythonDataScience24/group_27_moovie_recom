@@ -4,48 +4,35 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.scrollview import ScrollView
 from kivy_garden.matplotlib.backend_kivyagg import FigureCanvasKivyAgg
 
+from recommendation_system import RecommendationSystem
+
 from gui.movie_list_element import MovieListElement
 from gui.movie_list import MovieList
+from gui.genre_selection import GenreSelectionWidget
 
-from recommendation_system import RecommendationSystem
 
 from movie import Movie
 
 
-class VisualizationBox(BoxLayout):
-    """Class used to display liked elements."""
-    def __init__(self, recsys:RecommendationSystem, **kwargs):
-        super(VisualizationBox, self).__init__(**kwargs)
-
-        self.recsys = recsys
-        self.figureCanvas = None
-
-    def update_visualization(self):
-        figure = self.recsys.get_liked_visualization()
-        self.clear_widgets()
-        self.figureCanvas = FigureCanvasKivyAgg(figure)
-        self.add_widget(self.figureCanvas)
 
 
-
-class LikedTab(TabbedPanelItem):
+class LikedMovieTab(TabbedPanelItem):
     """Class used to display a search tab."""
 
     def __init__(self, recsys:RecommendationSystem, **kwargs):
-        super(LikedTab, self).__init__(text="Liked")
+        super(LikedMovieTab, self).__init__(text="Movie")
 
         self.recsys = recsys
 
-        self.liked_layout = BoxLayout(orientation='horizontal')
-        self.visualization = VisualizationBox(self.recsys)
+        self.liked_movie_layout = BoxLayout(orientation='horizontal')
 
         self.movie_list = MovieList()
         self.movie_scroll = ScrollView(size_hint=(2, 1))
 
         self.movie_scroll.add_widget(self.movie_list)
-        self.liked_layout.add_widget(self.movie_scroll)
-        self.liked_layout.add_widget(self.visualization)
-        self.add_widget(self.liked_layout)
+        self.liked_movie_layout.add_widget(self.movie_scroll)
+
+        self.add_widget(self.liked_movie_layout)
 
 
     def update(self):
@@ -69,7 +56,3 @@ class LikedTab(TabbedPanelItem):
 
             
             self.movie_list.add_widget(MovieListElement(movie_obj, self.recsys))
-
-        # Update the visualization
-        self.recsys.update_liked_visualizations()
-        self.visualization.update_visualization()

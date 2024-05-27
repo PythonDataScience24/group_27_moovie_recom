@@ -48,7 +48,7 @@ def create_liked_visualizations(liked_movie_list: pd.DataFrame) -> plt.Figure:
     genre_df = create_genre_data(liked_movie_list)
     actors_df = create_actor_data(liked_movie_list)
     runtime_data = create_runtime_data(liked_movie_list)
-
+    
     fig = plot(genre_df, actors_df, runtime_data)
 
     return fig
@@ -56,7 +56,10 @@ def create_liked_visualizations(liked_movie_list: pd.DataFrame) -> plt.Figure:
 def create_genre_data(liked_movie_list):
     # create genre pie chart data
     genre_df = liked_movie_list[['id', 'genre']]
-    split_genre_df = pd.DataFrame()
+    split_genre_df = pd.DataFrame(columns=['id','genre'])
+
+
+
     for index, entry in genre_df.iterrows():
         for genre in entry['genre']:
             split_genre_df = pd.concat(
@@ -69,7 +72,7 @@ def create_genre_data(liked_movie_list):
 
 def create_actor_data(liked_movie_list):
     actors_df = liked_movie_list[['id', 'actors']]
-    split_actors_df = pd.DataFrame()
+    split_actors_df = pd.DataFrame(columns=['id','actors'])
     for index, entry in actors_df.iterrows():
         for actor in entry['actors']:
             split_actors_df = pd.concat(

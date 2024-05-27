@@ -3,14 +3,13 @@ from kivy.uix.tabbedpanel import TabbedPanelItem
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.scrollview import ScrollView
 
+from movie import PersonRole
 from recommendation_system import RecommendationSystem
-from gui.movie_list import MovieList
+
 from gui.searchbar import PersonSearchBar
 from gui.person_list import PersonList
-from gui.movie_list_element import MovieListElement
 from gui.person_list_element import PersonListElement
 
-from movie import PersonRole
 
 
 class PersonSearchTab(TabbedPanelItem):
@@ -21,11 +20,11 @@ class PersonSearchTab(TabbedPanelItem):
         tab_name = ""
         match person_role:
             case PersonRole.ACTOR:
-                tab_name = "Actor search"
+                tab_name = "Actor"
             case PersonRole.WRITER:
-                tab_name = "Writer search"
+                tab_name = "Writer"
             case PersonRole.DIRECTOR:
-                tab_name = "Director search"
+                tab_name = "Director"
 
         super(PersonSearchTab, self).__init__(text=tab_name)
 

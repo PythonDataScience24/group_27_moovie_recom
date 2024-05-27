@@ -23,13 +23,6 @@ class RecommendedTab(TabbedPanelItem):
 
         self.tmdbi = TMDBInterface()
 
-        # recommended_layout = BoxLayout(orientation='vertical')
-        # recommended_scroll = ScrollView(size_hint=(1, 1))
-        # self.recommended_movies_list = GridLayout(cols=1, spacing=100, size_hint_y=None)
-        # self.recommended_movies_list.bind(minimum_height=self.recommended_movies_list.setter('height'))
-        # recommended_scroll.add_widget(self.recommended_movies_list)
-        # recommended_layout.add_widget(recommended_scroll)
-
         self.recommended_layout = BoxLayout(orientation='vertical')
         self.movie_list = MovieList()
         self.movie_scroll = ScrollView(size_hint_y=1)

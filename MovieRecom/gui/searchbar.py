@@ -1,14 +1,13 @@
-from kivy.app import App
 from kivy.uix.textinput import TextInput
 from kivy.uix.boxlayout import BoxLayout
-from kivy.app import App
 
+from movie import PersonRole
 from recommendation_system import RecommendationSystem
+
 from gui.movie_list_element import MovieListElement
 from gui.person_list_element import PersonListElement
 from gui.movie_list import MovieList
 from gui.person_list import PersonList
-from movie import PersonRole
 
 
 
