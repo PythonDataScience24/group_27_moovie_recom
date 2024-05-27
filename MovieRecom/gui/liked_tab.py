@@ -70,6 +70,6 @@ class LikedTab(TabbedPanelItem):
             
             self.movie_list.add_widget(MovieListElement(movie_obj, self.recsys))
 
-            # Update the visualization
-            self.recsys.update_liked_visualizations()
-            self.visualization.update_visualization()
+        # Update the visualization
+        self.recsys.update_liked_visualizations()
+        self.visualization.update_visualization()

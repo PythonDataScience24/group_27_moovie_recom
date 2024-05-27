@@ -104,7 +104,7 @@ class RecommendationSystem():
         
         rating = 0
         if is_liked: # Rating is 0 if we are not liked
-            rating = self.liked_movies[self.liked_movies['id'] == movie.id]['rating'][0]
+            rating = self.liked_movies[self.liked_movies['id'] == movie.id]['rating'].values[0]
         
         return (is_liked, rating)
 
@@ -144,22 +144,23 @@ class RecommendationSystem():
 
         (current_liked, current_rating) = self.is_movie_liked(movie)
 
-
-
         if liked and not current_liked:
             # Add the movie to the recommendation system if it wasn't liked before
             print("Adding movie to recommendation system")
             df_movie = DataFrame([movie.to_dict()])
             self.liked_movies = pd.concat([self.liked_movies, df_movie], ignore_index=True)
+
         elif not liked and current_liked:
             # Removes the movie from the recommendation system if it was liked before, but is now disliked
             print("Removing movie from recommendation system")
             self.liked_movies = self.liked_movies.drop(self.liked_movies[self.liked_movies['id'] == movie.id].index)
+
         elif liked and current_liked:
             # Updates the rating of the movie
             print("Updating movie rating")
             df_movie = DataFrame([movie.to_dict()])
-            self.liked_movies[self.liked_movies['id'] == movie.id] = df_movie
+            self.liked_movies.loc[self.liked_movies['id'] == movie.id, 'liked'] = movie.liked
+            self.liked_movies.loc[self.liked_movies['id'] == movie.id, 'rating'] = movie.rating
         else:
             print("ERROR!!")
             

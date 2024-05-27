@@ -179,13 +179,9 @@ class MovieListElement(GridLayout):
             self.movie.rating = star_clicked-1
         else:
             self.movie.rating = star_clicked
-        
-        
-
         self.movie.liked = self.movie.rating > 0
 
         self.recsys.set_liked_movie(self.movie, self.movie.liked, self.movie.rating)
-
         self.update_displayed_rating()
     
 
