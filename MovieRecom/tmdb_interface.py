@@ -65,7 +65,6 @@ class TMDBInterface:
             director_list,
             writer_list,
             actor_list,
-            False
         )
     
 

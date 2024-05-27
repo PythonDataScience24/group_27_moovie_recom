@@ -34,5 +34,4 @@ class MovieSearchTab(TabbedPanelItem):
 
         for movie_list_element in self.movie_list.children[:]:
             if isinstance(movie_list_element, MovieListElement):
-                # print(f"Removed movie from liked list: {child.title}")
                 movie_list_element.update()

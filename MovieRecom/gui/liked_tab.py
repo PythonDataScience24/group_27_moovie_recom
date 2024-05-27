@@ -64,7 +64,8 @@ class LikedTab(TabbedPanelItem):
                 director=movie_row['director'],
                 actors=movie_row['actors'],
                 release_date=movie_row['release_date'],
-                liked=movie_row['liked'],)
+                liked=movie_row['liked'],
+                rating=movie_row['rating'])
 
             
             self.movie_list.add_widget(MovieListElement(movie_obj, self.recsys))

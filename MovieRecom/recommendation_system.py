@@ -23,7 +23,8 @@ class RecommendationSystem():
                 'director',
                 'writer',
                 'actors',
-                'liked'
+                'liked',
+                'rating'
             ])
         
         self.tmdbi = TMDBInterface()
@@ -66,7 +67,9 @@ class RecommendationSystem():
 
         for new_movie in self.tmdbi.search_movie(query):
             # We check in our recommendation system if some elements are already liked by the user.
-            new_movie.liked = self.is_movie_liked(new_movie)
+            (liked, rating) = self.is_movie_liked(new_movie)
+            new_movie.liked = liked
+            new_movie.rating = rating
             new_movie.genre = self.init_genres_liked(new_movie.genre)
             new_movie.director = self.init_person_liked(new_movie.director, PersonRole.DIRECTOR)
             new_movie.writer = self.init_person_liked(new_movie.writer, PersonRole.WRITER)
@@ -95,11 +98,17 @@ class RecommendationSystem():
         return loaded_persons
 
 
-    def is_movie_liked(self, movie: Movie) -> bool:
-        """Returns whether the provided movie was liked by the user."""
-        return movie.id in self.liked_movies['id'].values
+    def is_movie_liked(self, movie: Movie) -> tuple[bool, Series]:
+        """Returns whether the provided movie was liked by the user along with its rating."""
+        is_liked = movie.id in self.liked_movies['id'].values
+        
+        rating = 0
+        if is_liked: # Rating is 0 if we are not liked
+            rating = self.liked_movies[self.liked_movies['id'] == movie.id]['rating'][0]
+        
+        return (is_liked, rating)
 
-
+        
     def is_genre_liked(self, genre: Genre) -> bool:
         """Returns whether a genre was liked by the user."""
         return genre.name in self.liked_genres.values
@@ -128,14 +137,33 @@ class RecommendationSystem():
             person_list[i].liked = self.is_person_liked(person_list[i], person_role)
         return person_list
     
-    def set_liked_movie(self, movie: Movie, liked: bool):
+    def set_liked_movie(self, movie: Movie, liked:bool, rating:int):
         """Likes or unlikes a movie."""
         movie.liked = liked
-        if liked:
+        movie.rating = rating
+
+        (current_liked, current_rating) = self.is_movie_liked(movie)
+
+
+
+        if liked and not current_liked:
+            # Add the movie to the recommendation system if it wasn't liked before
+            print("Adding movie to recommendation system")
             df_movie = DataFrame([movie.to_dict()])
             self.liked_movies = pd.concat([self.liked_movies, df_movie], ignore_index=True)
-        else:
+        elif not liked and current_liked:
+            # Removes the movie from the recommendation system if it was liked before, but is now disliked
+            print("Removing movie from recommendation system")
             self.liked_movies = self.liked_movies.drop(self.liked_movies[self.liked_movies['id'] == movie.id].index)
+        elif liked and current_liked:
+            # Updates the rating of the movie
+            print("Updating movie rating")
+            df_movie = DataFrame([movie.to_dict()])
+            self.liked_movies[self.liked_movies['id'] == movie.id] = df_movie
+        else:
+            print("ERROR!!")
+            
+        
         print(self.liked_movies)
 
 
@@ -151,7 +179,7 @@ class RecommendationSystem():
     def set_liked_person(self, person: Person, liked: bool, person_role:PersonRole):
         """Likes or unlikes a person."""
         person.liked = liked
-        
+
         selected_liked_person_list: list[Person] = []
 
         match person_role:

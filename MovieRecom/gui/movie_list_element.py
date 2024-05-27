@@ -13,6 +13,16 @@ class MovieListElement(GridLayout):
     def __init__(self, movie:Movie, recsys:RecommendationSystem, **kwargs):
         super(MovieListElement, self).__init__(**kwargs)
 
+        self.img_star_not_liked = "images/star-outline.png"
+        self.img_star_liked = "images/star.png"
+
+        self.liked_img_path = self.img_star_not_liked
+        self.star_1_img_path = self.img_star_not_liked
+        self.star_2_img_path = self.img_star_not_liked
+        self.star_3_img_path = self.img_star_not_liked
+        self.star_4_img_path = self.img_star_not_liked
+        self.star_5_img_path = self.img_star_not_liked
+
         # Movie object
         self.movie = movie
 
@@ -40,18 +50,32 @@ class MovieListElement(GridLayout):
         self.title_label.font_size = 40
         self.title_label.padding = [10,0,0,0]
 
-        # Set "liked" icon
-        self.liked_img_path = 'images/heart-outline.png' if not self.movie.liked else 'images/heart-off-outline.png'
+
         self.liked_img = Image(
             source=self.liked_img_path,
             size_hint=(None, 1),
             width=50,
             height=50,
             allow_stretch=False,
-            keep_ratio=True
+            keep_ratio=True,
             )
         
-        self.liked_img.bind(on_touch_down=self.on_heart_click)
+        self.star_1_img = Image(source=self.star_1_img_path,size_hint=(None, 1),width=50,height=50,allow_stretch=False,keep_ratio=True,)
+        self.star_2_img = Image(source=self.star_2_img_path,size_hint=(None, 1),width=50,height=50,allow_stretch=False,keep_ratio=True,)
+        self.star_3_img = Image(source=self.star_3_img_path,size_hint=(None, 1),width=50,height=50,allow_stretch=False,keep_ratio=True,)
+        self.star_4_img = Image(source=self.star_4_img_path,size_hint=(None, 1),width=50,height=50,allow_stretch=False,keep_ratio=True,)
+        self.star_5_img = Image(source=self.star_5_img_path,size_hint=(None, 1),width=50,height=50,allow_stretch=False,keep_ratio=True,)
+
+        # self.liked_img.bind(on_touch_down=self.on_heart_click)
+        self.bind(on_touch_down=self.on_star_click)
+        # self.star_1_img.bind(on_touch_down=self.on_star_click)
+        # self.star_2_img.bind(on_touch_down=self.on_star_click)
+        # self.star_3_img.bind(on_touch_down=self.on_star_click)
+        # self.star_4_img.bind(on_touch_down=self.on_star_click)
+        # self.star_5_img.bind(on_touch_down=self.on_star_click)
+
+        # Set "liked" icon
+        self.update_displayed_rating()
 
         # Set tags area
         genre_list = [genre.name for genre in self.movie.genre]
@@ -74,13 +98,17 @@ class MovieListElement(GridLayout):
 
         # Layouts
         self.body_layout = GridLayout(rows=2)
-        self.title_layout = GridLayout(cols=2)
+        self.title_layout = GridLayout(cols=7)
         self.detail_layout = GridLayout(cols=4)
 
 
         # Title layout
-        self.title_layout.add_widget(self.liked_img)
         self.title_layout.add_widget(self.title_label)
+        self.title_layout.add_widget(self.star_1_img)
+        self.title_layout.add_widget(self.star_2_img)
+        self.title_layout.add_widget(self.star_3_img)
+        self.title_layout.add_widget(self.star_4_img)
+        self.title_layout.add_widget(self.star_5_img)
 
         # Detail layout
         self.detail_layout.add_widget(self.tag_label)
@@ -96,23 +124,79 @@ class MovieListElement(GridLayout):
         # Add to layout
         self.add_widget(self.poster_img)
         self.add_widget(self.body_layout)
-        # self.add_widget()
 
-    def on_heart_click(self, instance, touch):
+    def update_displayed_rating(self):
+
+        self.star_1_img_path = self.img_star_not_liked
+        self.star_2_img_path = self.img_star_not_liked
+        self.star_3_img_path = self.img_star_not_liked
+        self.star_4_img_path = self.img_star_not_liked
+        self.star_5_img_path = self.img_star_not_liked
+
+        # TODO: Optimize
+        if self.movie.rating > 0:
+            self.star_1_img_path = self.img_star_liked
+        if self.movie.rating > 1:
+            self.star_2_img_path = self.img_star_liked
+        if self.movie.rating > 2:
+            self.star_3_img_path = self.img_star_liked
+        if self.movie.rating > 3:
+            self.star_4_img_path = self.img_star_liked
+        if self.movie.rating > 4:
+            self.star_5_img_path = self.img_star_liked
+
+        self.star_1_img.source = self.star_1_img_path
+        self.star_2_img.source = self.star_2_img_path
+        self.star_3_img.source = self.star_3_img_path
+        self.star_4_img.source = self.star_4_img_path
+        self.star_5_img.source = self.star_5_img_path
+
+
+
+    def on_star_click(self, instance, touch):
         """Toggle liked on heart click."""
-        if self.liked_img.collide_point(*touch.pos):
-            self.movie.liked = not self.movie.liked
-            self.liked_img.source = 'images/heart-outline.png' if not self.movie.liked else 'images/heart-off-outline.png'
-            self.recsys.set_liked_movie(self.movie, self.movie.liked)
 
-            # self.recsys.update_liked_visualizations()
+        
+        if not self.collide_point(*touch.pos):
+            return
+        
+        print("STAR PRESSED")
+        star_clicked = 0
 
+        if self.star_1_img.collide_point(*touch.pos):
+            star_clicked = 1
+        if self.star_2_img.collide_point(*touch.pos):
+            star_clicked = 2
+        if self.star_3_img.collide_point(*touch.pos):
+            star_clicked = 3
+        if self.star_4_img.collide_point(*touch.pos):
+            star_clicked = 4
+        if self.star_5_img.collide_point(*touch.pos):
+            star_clicked = 5
 
+        
+        if self.movie.rating == star_clicked:
+            self.movie.rating = star_clicked-1
+        else:
+            self.movie.rating = star_clicked
+        
+        
+
+        self.movie.liked = self.movie.rating > 0
+
+        self.recsys.set_liked_movie(self.movie, self.movie.liked, self.movie.rating)
+
+        self.update_displayed_rating()
+    
 
     def update(self):
-        self.movie.liked = self.recsys.is_movie_liked(self.movie)
+        (liked, rating) = self.recsys.is_movie_liked(self.movie)
+        self.movie.liked = liked
+        self.movie.rating = rating
+
         self.movie.genre = self.recsys.init_genres_liked(self.movie.genre)
         self.movie.director = self.recsys.init_person_liked(self.movie.director, PersonRole.DIRECTOR)
         self.movie.writer = self.recsys.init_person_liked(self.movie.writer, PersonRole.WRITER)
         self.movie.actors = self.recsys.init_person_liked(self.movie.actors, PersonRole.ACTOR)
-        self.liked_img.source = 'images/heart-outline.png' if not self.movie.liked else 'images/heart-off-outline.png'
+
+        self.update_displayed_rating()

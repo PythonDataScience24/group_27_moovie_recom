@@ -39,7 +39,8 @@ class Movie():
             director:list[Person]=[],
             writer:list[Person]=[],
             actors:list[Person]=[],
-            liked:bool=False
+            liked:bool=False, # Liked only defines if we store the movie in our recommendation system
+            rating: int=0 # 0 to 5 rating
             ) -> None:
 
         self.id = id
@@ -52,6 +53,7 @@ class Movie():
         self.writer = writer
         self.actors = actors
         self.liked = liked
+        self.rating = rating
 
     def to_dict(self) -> dict:
         """Returns the object in the form of a dictionnary."""
@@ -65,6 +67,7 @@ class Movie():
             'director': self.director,
             'writer': self.writer,
             'actors': self.actors,
-            'liked': self.liked
+            'liked': self.liked,
+            'rating': self.rating
         }
 
