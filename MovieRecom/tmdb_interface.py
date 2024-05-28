@@ -69,7 +69,7 @@ class TMDBInterface:
 
         poster_url = ""
         if json_movie_details['poster_path']:
-            poster_url = f'{self.img_url}{json_movie_details['poster_path']}'
+            poster_url = f'{self.img_url}{json_movie_details["poster_path"]}'
 
         return Movie(
             json_movie_details['imdb_id'],
@@ -148,7 +148,7 @@ class TMDBInterface:
             if hasRole:
                 poster_url = ""
                 if json_person['profile_path']:
-                    poster_url = f'{self.img_url}{json_person['profile_path']}'
+                    poster_url = f'{self.img_url}{json_person["profile_path"]}'
                 person_list.append(Person(json_person['id'],json_person['name'], personRole, poster_url))
 
         return person_list

@@ -4,6 +4,8 @@ import pandas as pd
 import pickle
 from scipy import sparse
 from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
+import re
 
 from tmdb_interface import TMDBInterface
 
@@ -35,22 +37,25 @@ class RecommendationSystem():
         # self.liked_writers: Series[str] = Series()
         # self.liked_actors: Series[str] = Series()
 
-        self.liked_directors: DataFrame = DataFrame(columns=['id','name','liked','rating','portrait_url'])
-        self.liked_writers: DataFrame = DataFrame(columns=['id','name','liked','rating','portrait_url'])
-        self.liked_actors: DataFrame = DataFrame(columns=['id','name','liked','rating','portrait_url'])
+        self.liked_directors: DataFrame = DataFrame(columns=['id', 'name', 'liked', 'rating', 'portrait_url'])
+        self.liked_writers: DataFrame = DataFrame(columns=['id', 'name', 'liked', 'rating', 'portrait_url'])
+        self.liked_actors: DataFrame = DataFrame(columns=['id', 'name', 'liked', 'rating', 'portrait_url'])
 
         self.liked_visual_figure = None
 
         # CountVectorizer
-        with open('./data/finalized_model.pkl', 'rb') as f:
+        with open('../data/finalized_model.pkl', 'rb') as f:
             self.vectorizer = pickle.load(f)
 
         # Already vectorized all the movies in dataset of recommendations
-        self.vectorized_dataset = sparse.load_npz('./data/vectorized_dataset.npz')
+        self.vectorized_dataset = sparse.load_npz('../data/vectorized_dataset.npz')
 
         # Dataset with all data about movie for recommendations
-        self.df_full = pd.read_csv("./data/finalized_dataset.csv")
-        print(self.df_full)
+        self.df_full = pd.read_csv("../data/finalized_dataset.csv")
+
+        # Dataset with all actors, directors, writes names and their ids
+        self.df_imdb_names = pd.read_csv("../data/name_basics.csv")
+
 
     # TODO: The two following functions probably shouldn't be placed here
     def update_liked_visualizations(self) -> None:
@@ -219,7 +224,13 @@ class RecommendationSystem():
     def generate_recommendations(self) -> DataFrame:
         """Generates movie recommendations based on liked movies."""
 
-        if self.liked_movies.empty:
+        if (
+                self.liked_movies.empty
+                and self.liked_writers.empty
+                and self.liked_actors.empty
+                and self.liked_directors.empty
+                and self.liked_genres.empty
+        ):
             # Return empty liked movie list if we don't have any to display.
             return DataFrame(columns=[
                 'id',
@@ -233,21 +244,82 @@ class RecommendationSystem():
                 'actors',
                 'liked'
             ])
-        
-        df_liked_movies = self.df_full[self.df_full['tconst'].isin(self.liked_movies["id"])]
-        user_movie_idx = df_liked_movies.index
-        movies_soup = df_liked_movies['soup']
-        count_user_matrix = self.vectorizer.transform(movies_soup)
-        count_user_vec = count_user_matrix.sum(axis=0) / count_user_matrix.sum(axis=0).max()
-        
 
-        similarity = cosine_similarity(sparse.csr_matrix(count_user_vec), self.vectorized_dataset)[0]
+        # get existing movies and prepare data
+        liked_movies_indexes = self.get_liked_movies_indexes()
+        liked_movies_vec = self.get_vectorized_liked_movies()
+        liked_names_vec = self.get_vectorized_liked_names(weight=0.33)
+        liked_genres_vec = self.get_vectorized_liked_genres(weight=0.5)
+        user_vec = liked_names_vec + liked_movies_vec + liked_genres_vec
+        user_vec = user_vec.sum(axis=0) / user_vec.sum(axis=0).max()
+
+        # calculate cosine_similarity
+        similarity = cosine_similarity(sparse.csr_matrix(user_vec), self.vectorized_dataset)[0]
         scores = similarity * self.df_full['weightedAverage']
 
-
+        # retrieving recommended movies
         similar_scores = list(enumerate(scores))
         similar_scores = sorted(similar_scores, key=lambda x: x[1], reverse=True)
 
-        recommend_movie_indices = [idx for idx, score in similar_scores if idx not in user_movie_idx][:10]
-        
+        recommend_movie_indices = [idx for idx, score in similar_scores if idx not in liked_movies_indexes][:10]
         return self.df_full.iloc[recommend_movie_indices]
+
+    def get_liked_movies_indexes(self):
+        df_liked_movies = pd.merge(
+            self.df_full.reset_index(),
+            self.liked_movies,
+            how="inner",
+            left_on="tconst",
+            right_on="id"
+        ).set_index("index")
+        return df_liked_movies.index
+
+    def get_vectorized_liked_movies(self):
+        df_liked_movies = pd.merge(
+            self.df_full.reset_index(),
+            self.liked_movies,
+            how="inner",
+            left_on="tconst",
+            right_on="id"
+        ).set_index("index")
+        movies_soup = df_liked_movies['soup']
+
+        if df_liked_movies.empty:
+            return self.vectorizer.transform([""])
+
+        # calculate user_vec
+        print(df_liked_movies)
+        liked_movie_weights = (df_liked_movies["rating"] * 2 / self.df_full[["weightedAverage"]].values.mean()).values
+        count_movies_matrix = self.vectorizer.transform(movies_soup)
+        count_movies_matrix_weighted = count_movies_matrix.multiply(liked_movie_weights[:, np.newaxis]).astype("float64")
+        count_movies_vec = count_movies_matrix_weighted.sum(axis=0) / count_movies_matrix_weighted.sum(axis=0).max()
+
+        return count_movies_vec
+
+    def get_vectorized_liked_names(self, weight=0.33):
+        def normalize_name(name):
+            # Remove non-alphabetic characters
+            name = re.sub(r'[^a-zA-Z\s]', '', name)
+            # Convert to lowercase and strip whitespace
+            return name.strip().lower()
+
+        if self.liked_directors.empty and self.liked_writers.empty and self.liked_actors.empty:
+            return self.vectorizer.transform([""])
+
+        # Apply the normalization to both dataframes
+        liked_names = pd.concat([self.liked_directors, self.liked_writers, self.liked_actors])
+        liked_names['normalized_name'] = liked_names['name'].apply(normalize_name)
+        self.df_imdb_names['normalized_name'] = self.df_imdb_names['primaryName'].apply(normalize_name)
+
+        # Merge the dataframes on the normalized names
+        merged_df = pd.merge(liked_names, self.df_imdb_names, on='normalized_name', how='inner')
+
+        # Filter to only include liked directors and select the relevant columns
+        liked_nconsts = merged_df[merged_df['liked']]["nconst"]
+
+        liked_names_vec = self.vectorizer.transform([" ".join(liked_nconsts)]) * weight
+        return liked_names_vec
+
+    def get_vectorized_liked_genres(self, weight=0.5):
+        liked_genres_vec = self.vectorizer.transform([" ".join(self.liked_genres)]) * weight
+        return liked_genres_vec
