@@ -32,7 +32,7 @@ To run the Movie Recommendation System locally, follow these steps:
 3. Clone the repository: `git clone https://github.com/PythonDataScience24/group_27_movie_recom.git`
 4. Navigate to the project directory: `cd group_27_movie_recom`
 5. Install dependencies: `pip install -r requirements.txt`
-6. Install one more library be executing: `python -m pip install https://github.com/kivy-garden/matplotlib/archive/master.zip`
+6. Remove lines 294-297 in `MovieRecom\env\Lib\site-packages\kivy_garden\matplotlib\backend_kivy.py`
 
 ## Usage
 
