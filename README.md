@@ -4,10 +4,12 @@ This project is a movie recommendation system designed to help users discover ne
 
 ## Table of Contents
 
-- [Description](#description)
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
+- [Movie Recommendation System](#movie-recommendation-system)
+  - [Table of Contents](#table-of-contents)
+  - [Description](#description)
+  - [Features](#features)
+  - [Installation](#installation)
+  - [Usage](#usage)
 
 ## Description
 
@@ -35,8 +37,9 @@ To run the Movie Recommendation System locally, follow these steps:
 6. Remove lines 294-297 in `MovieRecom\env\Lib\site-packages\kivy_garden\matplotlib\backend_kivy.py`
 
 ## Usage
-
-1. Input movies you have watched along with ratings using the provided interface.
-2. Optionally specify your favorite genres, actors, or directors.
-3. Receive personalized movie recommendations based on your input.
-4. Explore visualizations to analyze trends in your movie preferences.
+1. Enter the `MovieRecom` folder.
+2. Run the program with `py .\main.py`.
+3. Input movies you have watched along with ratings using the provided interface.
+4. Optionally specify your favorite genres, actors, or directors.
+5. Receive personalized movie recommendations based on your input.
+6. Explore visualizations to analyze trends in your movie preferences.
